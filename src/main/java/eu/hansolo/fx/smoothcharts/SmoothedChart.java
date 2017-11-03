@@ -92,10 +92,12 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
     public SmoothedChart(final Axis<T> xAxis, final Axis<S> yAxis) {
         super(xAxis, yAxis);
         init();
+        registerListeners();
     }
     public SmoothedChart(final Axis<T> xAxis, final Axis<S> yAxis, final ObservableList<Series<T, S>> data) {
         super(xAxis, yAxis, data);
         init();
+        registerListeners();
     }
 
 
@@ -141,8 +143,16 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
         chartPlotBackground.heightProperty().addListener(o -> resizeSelector(chartPlotBackground));
         chartPlotBackground.layoutYProperty().addListener(o -> resizeSelector(chartPlotBackground));
 
-        getChartChildren().addAll(selector);
+        Path horizontalGridLines = getHorizontalGridLines();
+        if (null != horizontalGridLines) { horizontalGridLines.setMouseTransparent(true); }
 
+        Path verticalGridLines = getVerticalGridLines();
+        if (null != verticalGridLines) { verticalGridLines.setMouseTransparent(true); }
+
+        getChartChildren().addAll(selector);
+    }
+
+    private void registerListeners() {
         getData().addListener((ListChangeListener<Series<T, S>>) change -> {
             while (change.next()) {
                 if (change.wasAdded()) {
@@ -168,7 +178,6 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
             }
         });
     }
-
 
     // ******************** Public Methods ************************************
     public boolean isSmoothed() { return null == smoothed ? _smoothed : smoothed.get(); }
@@ -372,6 +381,20 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
     private Region getChartBackground() {
         for (Node node : lookupAll(".chart-plot-background")) {
             if (node instanceof Region) { return (Region) node; }
+        }
+        return null;
+    }
+
+    private Path getHorizontalGridLines() {
+        for (Node node : lookupAll(".chart-horizontal-grid-lines")) {
+            if (node instanceof Path) { return (Path) node; }
+        }
+        return null;
+    }
+
+    private Path getVerticalGridLines() {
+        for (Node node : lookupAll(".chart-vertical-grid-lines")) {
+            if (node instanceof Path) { return (Path) node; }
         }
         return null;
     }
