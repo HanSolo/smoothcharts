@@ -93,6 +93,8 @@ public class Demo extends Application {
 
         lineChartNotSmoothed = new SmoothedChart<>(xAxis1, yAxis1);
         lineChartNotSmoothed.getData().addAll(series1);
+        //lineChartNotSmoothed.setSeriesDataPointsVisible(series1, false);
+        lineChartNotSmoothed.setDataPointsVisible(false);
         lineChartNotSmoothed.setSmoothed(false);
         lineChartNotSmoothed.setFilled(false);
         lineChartNotSmoothed.setInteractive(true);
