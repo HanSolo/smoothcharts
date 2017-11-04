@@ -42,6 +42,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.ClosePath;
 import javafx.scene.shape.LineTo;
@@ -383,6 +384,17 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
             stackPane.setVisible(VISIBLE);
         }
 
+    }
+
+    public void setSeriesColor(final XYChart.Series<T, S> SERIES, final Color COLOR) {
+        if (!getData().contains(SERIES)) { return; }
+        ((Path) ((Group) SERIES.getNode()).getChildren().get(0)).setFill(COLOR);
+        ((Path) ((Group) SERIES.getNode()).getChildren().get(1)).setStroke(COLOR);
+    }
+    public void setSeriesColor(final XYChart.Series<T, S> SERIES, final Color STROKE, final Paint FILL) {
+        if (!getData().contains(SERIES)) { return; }
+        ((Path) ((Group) SERIES.getNode()).getChildren().get(0)).setFill(FILL);
+        ((Path) ((Group) SERIES.getNode()).getChildren().get(1)).setStroke(STROKE);
     }
 
 
