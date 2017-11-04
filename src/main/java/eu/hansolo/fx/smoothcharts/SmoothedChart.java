@@ -30,6 +30,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -39,6 +40,9 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -396,7 +400,16 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
         ((Path) ((Group) SERIES.getNode()).getChildren().get(0)).setFill(FILL);
         ((Path) ((Group) SERIES.getNode()).getChildren().get(1)).setStroke(STROKE);
     }
-
+    public void setSeriesColor(final XYChart.Series<T, S> SERIES, final Paint STROKE, final Paint FILL, final BackgroundFill SYMBOL_STROKE, final BackgroundFill SYMBOL_Fill) {
+        if (!getData().contains(SERIES)) { return; }
+        ((Path) ((Group) SERIES.getNode()).getChildren().get(0)).setFill(FILL);
+        ((Path) ((Group) SERIES.getNode()).getChildren().get(1)).setStroke(STROKE);
+        for (XYChart.Data<T, S> data : SERIES.getData()) {
+            StackPane stackPane = (StackPane) data.getNode();
+            stackPane.setBackground(new Background(SYMBOL_STROKE, SYMBOL_Fill));
+        }
+    }
+    
 
     // ******************** Internal Methods **********************************
     @Override public String getUserAgentStylesheet() {
