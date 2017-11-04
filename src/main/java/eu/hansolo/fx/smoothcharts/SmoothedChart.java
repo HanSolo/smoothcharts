@@ -386,12 +386,12 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
 
     }
 
-    public void setSeriesColor(final XYChart.Series<T, S> SERIES, final Color COLOR) {
+    public void setSeriesColor(final XYChart.Series<T, S> SERIES, final Paint COLOR) {
         if (!getData().contains(SERIES)) { return; }
         ((Path) ((Group) SERIES.getNode()).getChildren().get(0)).setFill(COLOR);
         ((Path) ((Group) SERIES.getNode()).getChildren().get(1)).setStroke(COLOR);
     }
-    public void setSeriesColor(final XYChart.Series<T, S> SERIES, final Color STROKE, final Paint FILL) {
+    public void setSeriesColor(final XYChart.Series<T, S> SERIES, final Paint STROKE, final Paint FILL) {
         if (!getData().contains(SERIES)) { return; }
         ((Path) ((Group) SERIES.getNode()).getChildren().get(0)).setFill(FILL);
         ((Path) ((Group) SERIES.getNode()).getChildren().get(1)).setStroke(STROKE);
