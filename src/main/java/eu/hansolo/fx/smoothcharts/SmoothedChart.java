@@ -23,6 +23,8 @@ import javafx.animation.PauseTransition;
 import javafx.animation.SequentialTransition;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.BooleanPropertyBase;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.DoublePropertyBase;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.IntegerPropertyBase;
 import javafx.beans.property.ObjectProperty;
@@ -92,10 +94,13 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
     private              Circle                    selector;
     private              Tooltip                   selectorTooltip;
     private              Region                    chartPlotBackground;
+    private              PauseTransition           timeBeforeFadeOut;
     private              SequentialTransition      fadeInFadeOut;
     private              List<Path>                strokePaths;
     private              boolean                   _interactive;
     private              BooleanProperty           interactive;
+    private              double                    _tooltipTimeout;
+    private              DoubleProperty            tooltipTimeout;
     private              EventHandler<MouseEvent>  clickHandler;
     private              EventHandler<ActionEvent> endOfTransformationHandler;
 
@@ -125,6 +130,7 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
         _selectorStrokeColor       = Color.RED;
         _decimals                  = 2;
         _interactive               = true;
+        _tooltipTimeout            = 2000;
         formatString               = "%.2f";
         strokePaths                = new ArrayList<>();
         clickHandler               = e -> select(e);
@@ -143,11 +149,13 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
         fadeIn.setFromValue(0);
         fadeIn.setToValue(1);
 
+        timeBeforeFadeOut = new PauseTransition(Duration.millis(_tooltipTimeout));
+
         FadeTransition fadeOut = new FadeTransition(Duration.millis(100), selector);
         fadeOut.setFromValue(1);
         fadeOut.setToValue(0);
 
-        fadeInFadeOut = new SequentialTransition(fadeIn, new PauseTransition(Duration.millis(3000)), fadeOut);
+        fadeInFadeOut = new SequentialTransition(fadeIn, timeBeforeFadeOut, fadeOut);
         fadeInFadeOut.setOnFinished(endOfTransformationHandler);
 
         chartPlotBackground = getChartBackground();
@@ -384,6 +392,31 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
             };
         }
         return interactive;
+    }
+
+    public double getTooltipTimeout() { return null == tooltipTimeout ? _tooltipTimeout : tooltipTimeout.get(); }
+    public void setTooltipTimeout(final double TIMEOUT) {
+        if (null == tooltipTimeout) {
+            _tooltipTimeout = Helper.clamp(0, 10000, TIMEOUT);
+            timeBeforeFadeOut.setDuration(Duration.millis(_tooltipTimeout));
+        } else {
+            tooltipTimeout.set(TIMEOUT);
+        }
+    }
+    public DoubleProperty tooltipTimeoutProperty() {
+        if (null == tooltipTimeout) {
+            tooltipTimeout = new DoublePropertyBase(_tooltipTimeout) {
+                @Override protected void invalidated() {
+                    set(Helper.clamp(0, 10000, get()));
+                    timeBeforeFadeOut.setDuration(Duration.millis(get()));
+                }
+                @Override public Object getBean() { return SmoothedChart.this; }
+                @Override public String getName() {
+                    return "tootipTimeout";
+                }
+            };
+        }
+        return tooltipTimeout;
     }
 
     public void setSymbolsVisible(final XYChart.Series<T, S> SERIES, final boolean VISIBLE) {
