@@ -276,7 +276,7 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
     public void setDataPointsVisible(final boolean VISIBLE) {
         if (null == dataPointsVisible) {
             _dataPointsVisible = VISIBLE;
-            getData().forEach(series -> setSeriesDataPointsVisible(series, _dataPointsVisible));
+            getData().forEach(series -> setSymbolsVisible(series, _dataPointsVisible));
         } else {
             dataPointsVisible.set(VISIBLE);
         }
@@ -284,7 +284,7 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
     public BooleanProperty dataPointsVisibleProperty() {
         if (null == dataPointsVisible) {
             dataPointsVisible = new BooleanPropertyBase(_dataPointsVisible) {
-                @Override protected void invalidated() { getData().forEach(series -> setSeriesDataPointsVisible(series, _dataPointsVisible)); }
+                @Override protected void invalidated() { getData().forEach(series -> setSymbolsVisible(series, _dataPointsVisible)); }
                 @Override public Object getBean() { return SmoothedChart.this; }
                 @Override public String getName() { return "dataPointsVisible"; }
             };
@@ -383,69 +383,51 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
         return interactive;
     }
 
-    public void setSeriesDataPointsVisible(final XYChart.Series<T, S> SERIES, final boolean VISIBLE) {
+    public void setSymbolsVisible(final XYChart.Series<T, S> SERIES, final boolean VISIBLE) {
         if (!getData().contains(SERIES)) { return; }
         for (XYChart.Data<T, S> data : SERIES.getData()) {
             StackPane stackPane = (StackPane) data.getNode();
             stackPane.setVisible(VISIBLE);
         }
-
     }
 
     public void setSeriesColor(final XYChart.Series<T, S> SERIES, final Paint COLOR) {
-        if (!getData().contains(SERIES)) { return; }
-        ((Path) ((Group) SERIES.getNode()).getChildren().get(0)).setFill(COLOR);
-        ((Path) ((Group) SERIES.getNode()).getChildren().get(1)).setStroke(COLOR);
-        setLegendSymbolColor(SERIES, COLOR);
+        Background symbolBackground = new Background(new BackgroundFill(COLOR, new CornerRadii(5), Insets.EMPTY), new BackgroundFill(Color.WHITE, new CornerRadii(5), new Insets(2)));
+        setSeriesColor(SERIES, COLOR, COLOR, symbolBackground, COLOR);
     }
     public void setSeriesColor(final XYChart.Series<T, S> SERIES, final Paint STROKE, final Paint FILL) {
-        if (!getData().contains(SERIES)) { return; }
-        ((Path) ((Group) SERIES.getNode()).getChildren().get(0)).setFill(FILL);
-        ((Path) ((Group) SERIES.getNode()).getChildren().get(1)).setStroke(STROKE);
-        setLegendSymbolColor(SERIES, STROKE);
+        Background symbolBackground = new Background(new BackgroundFill(STROKE, new CornerRadii(5), Insets.EMPTY), new BackgroundFill(Color.WHITE, new CornerRadii(5), new Insets(2)));
+        setSeriesColor(SERIES, STROKE, FILL, symbolBackground, STROKE);
     }
     public void setSeriesColor(final XYChart.Series<T, S> SERIES, final Paint STROKE, final Paint FILL, final Paint LEGEND_SYMBOL_FILL) {
-        if (!getData().contains(SERIES)) { return; }
-        ((Path) ((Group) SERIES.getNode()).getChildren().get(0)).setFill(FILL);
-        ((Path) ((Group) SERIES.getNode()).getChildren().get(1)).setStroke(STROKE);
-        setLegendSymbolColor(SERIES, LEGEND_SYMBOL_FILL);
+        setSeriesColor(SERIES, STROKE, FILL, null, LEGEND_SYMBOL_FILL);
     }
     public void setSeriesColor(final XYChart.Series<T, S> SERIES, final Paint STROKE, final Paint FILL, final Background SYMBOL_BACKGROUND) {
-        if (!getData().contains(SERIES)) { return; }
-        ((Path) ((Group) SERIES.getNode()).getChildren().get(0)).setFill(FILL);
-        ((Path) ((Group) SERIES.getNode()).getChildren().get(1)).setStroke(STROKE);
-        for (XYChart.Data<T, S> data : SERIES.getData()) {
-            StackPane stackPane = (StackPane) data.getNode();
-            if (null == stackPane) { continue; }
-            stackPane.setBackground(SYMBOL_BACKGROUND);
-        }
-        setLegendSymbolColor(SERIES, STROKE);
+        setSeriesColor(SERIES, STROKE, FILL, SYMBOL_BACKGROUND, STROKE);
+    }
+    public void setSeriesColor(final XYChart.Series<T, S> SERIES, final Paint STROKE, final Paint FILL, final BackgroundFill SYMBOL_STROKE, final BackgroundFill SYMBOL_Fill) {
+        setSeriesColor(SERIES, STROKE, FILL, new Background(SYMBOL_STROKE, SYMBOL_Fill), STROKE);
     }
     public void setSeriesColor(final XYChart.Series<T, S> SERIES, final Paint STROKE, final Paint FILL, final Background SYMBOL_BACKGROUND, final Paint LEGEND_SYMBOL_FILL) {
         if (!getData().contains(SERIES)) { return; }
-        ((Path) ((Group) SERIES.getNode()).getChildren().get(0)).setFill(FILL);
-        ((Path) ((Group) SERIES.getNode()).getChildren().get(1)).setStroke(STROKE);
+        if (null != FILL) { ((Path) ((Group) SERIES.getNode()).getChildren().get(0)).setFill(FILL); }
+        if (null != STROKE) { ((Path) ((Group) SERIES.getNode()).getChildren().get(1)).setStroke(STROKE); }
+        if (null != SYMBOL_BACKGROUND) { setSymbolColor(SERIES, SYMBOL_BACKGROUND); }
+        if (null != LEGEND_SYMBOL_FILL) { setLegendSymbolColor(SERIES, LEGEND_SYMBOL_FILL); }
+    }
+
+    public void setSymbolColor(final Series<T, S> SERIES, final Background SYMBOL_BACKGROUND) {
+        if (!getData().contains(SERIES)) { return; }
         for (XYChart.Data<T, S> data : SERIES.getData()) {
             StackPane stackPane = (StackPane) data.getNode();
             if (null == stackPane) { continue; }
             stackPane.setBackground(SYMBOL_BACKGROUND);
         }
-        setLegendSymbolColor(SERIES, LEGEND_SYMBOL_FILL);
-    }
-    public void setSeriesColor(final XYChart.Series<T, S> SERIES, final Paint STROKE, final Paint FILL, final BackgroundFill SYMBOL_STROKE, final BackgroundFill SYMBOL_Fill) {
-        if (!getData().contains(SERIES)) { return; }
-        ((Path) ((Group) SERIES.getNode()).getChildren().get(0)).setFill(FILL);
-        ((Path) ((Group) SERIES.getNode()).getChildren().get(1)).setStroke(STROKE);
-        for (XYChart.Data<T, S> data : SERIES.getData()) {
-            StackPane stackPane = (StackPane) data.getNode();
-            if (null == stackPane) { continue; }
-            stackPane.setBackground(new Background(SYMBOL_STROKE, SYMBOL_Fill));
-        }
-        setLegendSymbolColor(SERIES, STROKE);
     }
 
     public void setLegendSymbolColor(final Series<T, S> SERIES, final Paint LEGEND_SYMBOL_FILL) {
         if (getData().isEmpty()) { return; }
+        if (!getData().contains(SERIES)) { return; }
 
         int seriesIndex = getData().indexOf(SERIES);
         if (seriesIndex == -1) { return; }

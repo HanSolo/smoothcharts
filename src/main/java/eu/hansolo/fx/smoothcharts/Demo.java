@@ -24,7 +24,6 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import javafx.scene.layout.StackPane;
 import javafx.scene.Scene;
 
 
@@ -94,7 +93,7 @@ public class Demo extends Application {
 
         lineChartNotSmoothed = new SmoothedChart<>(xAxis1, yAxis1);
         lineChartNotSmoothed.getData().addAll(series1);
-        lineChartNotSmoothed.setSeriesDataPointsVisible(series1, false);
+        lineChartNotSmoothed.setSymbolsVisible(series1, false);
         lineChartNotSmoothed.setSeriesColor(series1, Color.MAGENTA);
         lineChartNotSmoothed.setDataPointsVisible(false);
         lineChartNotSmoothed.setSmoothed(false);
