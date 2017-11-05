@@ -16,6 +16,7 @@
 
 package eu.hansolo.fx.smoothcharts;
 
+import eu.hansolo.fx.smoothcharts.SmoothedChart.ChartType;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.chart.CategoryAxis;
@@ -97,7 +98,7 @@ public class Demo extends Application {
         lineChartNotSmoothed.setSeriesColor(series1, Color.MAGENTA);
         lineChartNotSmoothed.setDataPointsVisible(false);
         lineChartNotSmoothed.setSmoothed(false);
-        lineChartNotSmoothed.setFilled(false);
+        lineChartNotSmoothed.setChartType(ChartType.LINE);
         lineChartNotSmoothed.setInteractive(true);
         lineChartNotSmoothed.setSubDivisions(8);
         lineChartNotSmoothed.setSnapToTicks(false);
@@ -106,7 +107,7 @@ public class Demo extends Application {
         lineChartSmoothed = new SmoothedChart<>(xAxis2, yAxis2);
         lineChartSmoothed.getData().addAll(series2);
         lineChartSmoothed.setSmoothed(true);
-        lineChartSmoothed.setFilled(false);
+        lineChartSmoothed.setChartType(ChartType.LINE);
         lineChartSmoothed.setInteractive(true);
         lineChartSmoothed.setSubDivisions(8);
         lineChartSmoothed.setSnapToTicks(false);
@@ -115,7 +116,7 @@ public class Demo extends Application {
         areaChartNotSmoothed = new SmoothedChart<>(xAxis3, yAxis3);
         areaChartNotSmoothed.getData().addAll(series3);
         areaChartNotSmoothed.setSmoothed(false);
-        areaChartNotSmoothed.setFilled(true);
+        areaChartNotSmoothed.setChartType(ChartType.AREA);
         areaChartNotSmoothed.setInteractive(true);
         areaChartNotSmoothed.setSubDivisions(8);
         areaChartNotSmoothed.setSnapToTicks(false);
@@ -124,7 +125,7 @@ public class Demo extends Application {
         areaChartSmoothed = new SmoothedChart<>(xAxis4, yAxis4);
         areaChartSmoothed.getData().addAll(series4);
         areaChartSmoothed.setSmoothed(true);
-        areaChartSmoothed.setFilled(true);
+        areaChartSmoothed.setChartType(ChartType.AREA);
         areaChartSmoothed.setInteractive(true);
         areaChartSmoothed.setSubDivisions(8);
         areaChartSmoothed.setSnapToTicks(false);
