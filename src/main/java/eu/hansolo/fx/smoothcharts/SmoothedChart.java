@@ -16,6 +16,8 @@
 
 package eu.hansolo.fx.smoothcharts;
 
+import com.sun.javafx.charts.Legend;
+import com.sun.javafx.charts.Legend.LegendItem;
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.animation.SequentialTransition;
@@ -394,11 +396,41 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
         if (!getData().contains(SERIES)) { return; }
         ((Path) ((Group) SERIES.getNode()).getChildren().get(0)).setFill(COLOR);
         ((Path) ((Group) SERIES.getNode()).getChildren().get(1)).setStroke(COLOR);
+        setLegendSymbolColor(SERIES, COLOR);
     }
     public void setSeriesColor(final XYChart.Series<T, S> SERIES, final Paint STROKE, final Paint FILL) {
         if (!getData().contains(SERIES)) { return; }
         ((Path) ((Group) SERIES.getNode()).getChildren().get(0)).setFill(FILL);
         ((Path) ((Group) SERIES.getNode()).getChildren().get(1)).setStroke(STROKE);
+        setLegendSymbolColor(SERIES, STROKE);
+    }
+    public void setSeriesColor(final XYChart.Series<T, S> SERIES, final Paint STROKE, final Paint FILL, final Paint LEGEND_SYMBOL_FILL) {
+        if (!getData().contains(SERIES)) { return; }
+        ((Path) ((Group) SERIES.getNode()).getChildren().get(0)).setFill(FILL);
+        ((Path) ((Group) SERIES.getNode()).getChildren().get(1)).setStroke(STROKE);
+        setLegendSymbolColor(SERIES, LEGEND_SYMBOL_FILL);
+    }
+    public void setSeriesColor(final XYChart.Series<T, S> SERIES, final Paint STROKE, final Paint FILL, final Background SYMBOL_BACKGROUND) {
+        if (!getData().contains(SERIES)) { return; }
+        ((Path) ((Group) SERIES.getNode()).getChildren().get(0)).setFill(FILL);
+        ((Path) ((Group) SERIES.getNode()).getChildren().get(1)).setStroke(STROKE);
+        for (XYChart.Data<T, S> data : SERIES.getData()) {
+            StackPane stackPane = (StackPane) data.getNode();
+            if (null == stackPane) { continue; }
+            stackPane.setBackground(SYMBOL_BACKGROUND);
+        }
+        setLegendSymbolColor(SERIES, STROKE);
+    }
+    public void setSeriesColor(final XYChart.Series<T, S> SERIES, final Paint STROKE, final Paint FILL, final Background SYMBOL_BACKGROUND, final Paint LEGEND_SYMBOL_FILL) {
+        if (!getData().contains(SERIES)) { return; }
+        ((Path) ((Group) SERIES.getNode()).getChildren().get(0)).setFill(FILL);
+        ((Path) ((Group) SERIES.getNode()).getChildren().get(1)).setStroke(STROKE);
+        for (XYChart.Data<T, S> data : SERIES.getData()) {
+            StackPane stackPane = (StackPane) data.getNode();
+            if (null == stackPane) { continue; }
+            stackPane.setBackground(SYMBOL_BACKGROUND);
+        }
+        setLegendSymbolColor(SERIES, LEGEND_SYMBOL_FILL);
     }
     public void setSeriesColor(final XYChart.Series<T, S> SERIES, final Paint STROKE, final Paint FILL, final BackgroundFill SYMBOL_STROKE, final BackgroundFill SYMBOL_Fill) {
         if (!getData().contains(SERIES)) { return; }
@@ -406,10 +438,30 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
         ((Path) ((Group) SERIES.getNode()).getChildren().get(1)).setStroke(STROKE);
         for (XYChart.Data<T, S> data : SERIES.getData()) {
             StackPane stackPane = (StackPane) data.getNode();
+            if (null == stackPane) { continue; }
             stackPane.setBackground(new Background(SYMBOL_STROKE, SYMBOL_Fill));
         }
+        setLegendSymbolColor(SERIES, STROKE);
     }
-    
+
+    public void setLegendSymbolColor(final Series<T, S> SERIES, final Paint LEGEND_SYMBOL_FILL) {
+        if (getData().isEmpty()) { return; }
+
+        int seriesIndex = getData().indexOf(SERIES);
+        if (seriesIndex == -1) { return; }
+
+        Legend legend = (Legend) getLegend();
+        if (null == legend) { return; }
+
+        LegendItem item = legend.getItems().get(seriesIndex);
+        if (null == item) { return; }
+
+        Region symbol = (Region) item.getSymbol();
+        if (null == symbol) { return; }
+
+        symbol.setBackground(new Background(new BackgroundFill(LEGEND_SYMBOL_FILL, new CornerRadii(6), Insets.EMPTY)));
+    }
+
 
     // ******************** Internal Methods **********************************
     @Override public String getUserAgentStylesheet() {
