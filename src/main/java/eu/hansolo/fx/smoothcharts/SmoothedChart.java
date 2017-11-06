@@ -595,10 +595,14 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
         Legend legend = (Legend) getLegend();
         if (null == legend) { return; }
 
+        LegendItem item = legend.getItems().get(seriesIndex);
+        if (null == item) { return; }
+
+        String itemText = item.getText();
         for (Node node : legend.lookupAll(".chart-legend-item")) {
             if (node instanceof Label) {
-                ((Label) node).setTextFill(FILL);
-                break;
+                Label label = (Label) node;
+                if (label.getText().equals(itemText)) { label.setTextFill(FILL); }
             }
         }
     }
