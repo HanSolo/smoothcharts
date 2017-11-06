@@ -130,8 +130,8 @@ public class Demo extends Application {
         lineChartSmoothed.setInteractive(true);
         lineChartSmoothed.setSubDivisions(8);
         lineChartSmoothed.setSnapToTicks(false);
-        lineChartSmoothed.setSymbolColor(series2, new Background(new BackgroundFill(Color.BLUE, new CornerRadii(1024), Insets.EMPTY),
-                                                                 new BackgroundFill(Color.LIME, new CornerRadii(1024), new Insets(2))));
+        lineChartSmoothed.setSymbolFill(series2, new Background(new BackgroundFill(Color.BLUE, new CornerRadii(1024), Insets.EMPTY),
+                                                                new BackgroundFill(Color.LIME, new CornerRadii(1024), new Insets(2))));
         lineChartSmoothed.setSymbolSize(series2, 20);
         lineChartSmoothed.setLegendVisible(false);
 

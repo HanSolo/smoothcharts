@@ -43,6 +43,7 @@ import javafx.scene.chart.AreaChart;
 import javafx.scene.chart.Axis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
@@ -485,8 +486,8 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
         if (!getData().contains(SERIES)) { return; }
         if (null != FILL) { ((Path) ((Group) SERIES.getNode()).getChildren().get(0)).setFill(FILL); }
         if (null != STROKE) { ((Path) ((Group) SERIES.getNode()).getChildren().get(1)).setStroke(STROKE); }
-        if (null != SYMBOL_BACKGROUND) { setSymbolColor(SERIES, SYMBOL_BACKGROUND); }
-        if (null != LEGEND_SYMBOL_FILL) { setLegendSymbolColor(SERIES, LEGEND_SYMBOL_FILL); }
+        if (null != SYMBOL_BACKGROUND) { setSymbolFill(SERIES, SYMBOL_BACKGROUND); }
+        if (null != LEGEND_SYMBOL_FILL) { setLegendSymbolFill(SERIES, LEGEND_SYMBOL_FILL); }
     }
 
     public void setSymbolSize(final Series<X, Y> SERIES, final double SIZE) {
@@ -500,32 +501,13 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
         }
     }
 
-    public void setSymbolColor(final Series<X, Y> SERIES, final Background SYMBOL_BACKGROUND) {
+    public void setSymbolFill(final Series<X, Y> SERIES, final Background SYMBOL_BACKGROUND) {
         if (!getData().contains(SERIES)) { return; }
         for (XYChart.Data<X, Y> data : SERIES.getData()) {
             StackPane stackPane = (StackPane) data.getNode();
             if (null == stackPane) { continue; }
             stackPane.setBackground(SYMBOL_BACKGROUND);
         }
-    }
-
-    public void setLegendSymbolColor(final Series<X, Y> SERIES, final Paint LEGEND_SYMBOL_FILL) {
-        if (getData().isEmpty()) { return; }
-        if (!getData().contains(SERIES)) { return; }
-
-        int seriesIndex = getData().indexOf(SERIES);
-        if (seriesIndex == -1) { return; }
-
-        Legend legend = (Legend) getLegend();
-        if (null == legend) { return; }
-
-        LegendItem item = legend.getItems().get(seriesIndex);
-        if (null == item) { return; }
-
-        Region symbol = (Region) item.getSymbol();
-        if (null == symbol) { return; }
-
-        symbol.setBackground(new Background(new BackgroundFill(LEGEND_SYMBOL_FILL, new CornerRadii(6), Insets.EMPTY)));
     }
 
     public Region getChartPlotBackground() {
@@ -591,6 +573,54 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
     }
     public void setChartPlotBackground(final Background BACKGROUND) {
         getChartPlotBackground().setBackground(BACKGROUND);
+    }
+
+    public void setLegendBackground(final Paint FILL) {
+        setLegendBackground(new Background(new BackgroundFill(FILL, CornerRadii.EMPTY, Insets.EMPTY)));
+    }
+    public void setLegendBackground(final Background BACKGROUND) {
+        Legend legend = (Legend) getLegend();
+        if (null == legend) { return; }
+        legend.setBackground(BACKGROUND);
+    }
+
+    public void setLegendTextFill(final Series<X, Y> SERIES, final Paint FILL) {
+        if (getData().isEmpty()) { return; }
+        if (!getData().contains(SERIES)) { return; }
+
+        int seriesIndex = getData().indexOf(SERIES);
+        if (seriesIndex == -1) { return; }
+
+        Legend legend = (Legend) getLegend();
+        if (null == legend) { return; }
+
+        LegendItem item = legend.getItems().get(seriesIndex);
+        if (null == item) { return; }
+
+        for (Node node : lookupAll(".chart-legend-item")) {
+            if (node instanceof Label) {
+                ((Label) node).setTextFill(FILL);
+                break;
+            }
+        }
+    }
+    public void setLegendSymbolFill(final Series<X, Y> SERIES, final Paint LEGEND_SYMBOL_FILL) {
+        if (getData().isEmpty()) { return; }
+        if (!getData().contains(SERIES)) { return; }
+
+        int seriesIndex = getData().indexOf(SERIES);
+        if (seriesIndex == -1) { return; }
+
+        Legend legend = (Legend) getLegend();
+        if (null == legend) { return; }
+
+        LegendItem item = legend.getItems().get(seriesIndex);
+        if (null == item) { return; }
+
+        Region symbol = (Region) item.getSymbol();
+        if (null == symbol) { return; }
+
+        symbol.setBackground(new Background(new BackgroundFill(LEGEND_SYMBOL_FILL, new CornerRadii(6), Insets.EMPTY)));
     }
 
     public void setXAxisTickMarkFill(final Paint FILL) {
