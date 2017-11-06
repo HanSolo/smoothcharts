@@ -113,7 +113,7 @@ public class Demo extends Application {
         lineChartNotSmoothed.setSubDivisions(8);
         lineChartNotSmoothed.setSnapToTicks(false);
         lineChartNotSmoothed.setLegendVisible(false);
-        lineChartNotSmoothed.getChartBackground().setBackground(TRANSPARENT_BACKGROUND);
+        lineChartNotSmoothed.getChartPlotBackground().setBackground(TRANSPARENT_BACKGROUND);
         lineChartNotSmoothed.getHorizontalGridLines().setStroke(Color.rgb(0, 0, 0, 0.5));
         lineChartNotSmoothed.getVerticalGridLines().setStroke(Color.rgb(0, 0, 0, 0.5));
         lineChartNotSmoothed.getHorizontalZeroLine().setStroke(Color.RED);

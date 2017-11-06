@@ -171,7 +171,7 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
         fadeInFadeOut = new SequentialTransition(fadeIn, timeBeforeFadeOut, fadeOut);
         fadeInFadeOut.setOnFinished(endOfTransformationHandler);
 
-        chartPlotBackground = getChartBackground();
+        chartPlotBackground = getChartPlotBackground();
         chartPlotBackground.widthProperty().addListener(o -> resizeSelector());
         chartPlotBackground.heightProperty().addListener(o -> resizeSelector());
         chartPlotBackground.layoutYProperty().addListener(o -> resizeSelector());
@@ -524,7 +524,7 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
         symbol.setBackground(new Background(new BackgroundFill(LEGEND_SYMBOL_FILL, new CornerRadii(6), Insets.EMPTY)));
     }
 
-    public Region getChartBackground() {
+    public Region getChartPlotBackground() {
         if (null == chartPlotBackground) {
             for (Node node : lookupAll(".chart-plot-background")) {
                 if (node instanceof Region) {
@@ -580,6 +580,13 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
             }
         }
         return verticalZeroLine;
+    }
+
+    public void setChartPlotBackground(final Paint FILL) {
+        setChartPlotBackground(new Background(new BackgroundFill(FILL, CornerRadii.EMPTY, Insets.EMPTY)));
+    }
+    public void setChartPlotBackground(final Background BACKGROUND) {
+        getChartPlotBackground().setBackground(BACKGROUND);
     }
 
     public void setXAxisTickMarkFill(final Paint FILL) {
