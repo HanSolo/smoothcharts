@@ -42,7 +42,6 @@ import javafx.scene.chart.AreaChart;
 import javafx.scene.chart.Axis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
@@ -82,8 +81,8 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
     private              IntegerProperty           subDivisions;
     private              boolean                   _snapToTicks;
     private              BooleanProperty           snapToTicks;
-    private              boolean                   _dataPointsVisible;
-    private              BooleanProperty           dataPointsVisible;
+    private              boolean                   _symbolsVisible;
+    private              BooleanProperty           symbolsVisible;
     private              Color                     _selectorFillColor;
     private              ObjectProperty<Color>     selectorFillColor;
     private              Color                     _selectorStrokeColor;
@@ -283,24 +282,24 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
         return snapToTicks;
     }
 
-    public boolean getDataPointsVisible() { return null == dataPointsVisible ? _dataPointsVisible : dataPointsVisible.get(); }
-    public void setDataPointsVisible(final boolean VISIBLE) {
-        if (null == dataPointsVisible) {
-            _dataPointsVisible = VISIBLE;
-            getData().forEach(series -> setSymbolsVisible(series, _dataPointsVisible));
+    public boolean getSymbolsVisible() { return null == symbolsVisible ? _symbolsVisible : symbolsVisible.get(); }
+    public void setSymbolsVisible(final boolean VISIBLE) {
+        if (null == symbolsVisible) {
+            _symbolsVisible = VISIBLE;
+            getData().forEach(series -> setSymbolsVisible(series, _symbolsVisible));
         } else {
-            dataPointsVisible.set(VISIBLE);
+            symbolsVisible.set(VISIBLE);
         }
     }
-    public BooleanProperty dataPointsVisibleProperty() {
-        if (null == dataPointsVisible) {
-            dataPointsVisible = new BooleanPropertyBase(_dataPointsVisible) {
-                @Override protected void invalidated() { getData().forEach(series -> setSymbolsVisible(series, _dataPointsVisible)); }
+    public BooleanProperty symbolsVisibleProperty() {
+        if (null == symbolsVisible) {
+            symbolsVisible = new BooleanPropertyBase(_symbolsVisible) {
+                @Override protected void invalidated() { getData().forEach(series -> setSymbolsVisible(series, _symbolsVisible)); }
                 @Override public Object getBean() { return SmoothedChart.this; }
-                @Override public String getName() { return "dataPointsVisible"; }
+                @Override public String getName() { return "symbolsVisible"; }
             };
         }
-        return dataPointsVisible;
+        return symbolsVisible;
     }
 
     public Color getSelectorFillColor() { return null == selectorFillColor ? _selectorFillColor : selectorFillColor.get(); }
@@ -458,6 +457,18 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
             StackPane stackPane = (StackPane) data.getNode();
             if (null == stackPane) { continue; }
             stackPane.setBackground(SYMBOL_BACKGROUND);
+        }
+    }
+
+    public void setSymbolSize(final Series<T, S> SERIES, final double SIZE) {
+        if (!getData().contains(SERIES)) { return; }
+        if (SERIES.getData().isEmpty()) { return; }
+        double symbolSize = Helper.clamp(0, 30, SIZE);
+        for (XYChart.Data<T, S> data : SERIES.getData()) {
+            StackPane stackPane = (StackPane) data.getNode();
+            if (null == stackPane) { continue; }
+            stackPane.setPrefSize(symbolSize, symbolSize);
+            stackPane.setStyle("-fx-background-radius: 1024px");
         }
     }
 

@@ -96,7 +96,7 @@ public class Demo extends Application {
         lineChartNotSmoothed.getData().addAll(series1);
         lineChartNotSmoothed.setSymbolsVisible(series1, false);
         lineChartNotSmoothed.setSeriesColor(series1, Color.MAGENTA);
-        lineChartNotSmoothed.setDataPointsVisible(false);
+        lineChartNotSmoothed.setSymbolsVisible(false);
         lineChartNotSmoothed.setSmoothed(false);
         lineChartNotSmoothed.setChartType(ChartType.LINE);
         lineChartNotSmoothed.setInteractive(true);
@@ -111,6 +111,7 @@ public class Demo extends Application {
         lineChartSmoothed.setInteractive(true);
         lineChartSmoothed.setSubDivisions(8);
         lineChartSmoothed.setSnapToTicks(false);
+        lineChartSmoothed.setSymbolSize(series2, 20);
         lineChartSmoothed.setLegendVisible(false);
 
         areaChartNotSmoothed = new SmoothedChart<>(xAxis3, yAxis3);
