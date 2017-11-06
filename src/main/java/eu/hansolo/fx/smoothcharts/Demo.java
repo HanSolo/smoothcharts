@@ -22,6 +22,9 @@ import javafx.geometry.Insets;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -34,13 +37,18 @@ import javafx.scene.Scene;
  * Time: 04:42
  */
 public class Demo extends Application {
+    private XYChart.Series<String, Number> series1;
+    private XYChart.Series<String, Number> series2;
+    private XYChart.Series<String, Number> series3;
+    private XYChart.Series<String, Number> series4;
+
     private SmoothedChart<String, Number> lineChartNotSmoothed;
     private SmoothedChart<String, Number> lineChartSmoothed;
     private SmoothedChart<String, Number> areaChartNotSmoothed;
     private SmoothedChart<String, Number> areaChartSmoothed;
 
     @Override public void init() {
-        XYChart.Series<String, Number> series1 = new XYChart.Series();
+        series1 = new XYChart.Series();
         series1.setName("Series 1");
         series1.getData().add(new XYChart.Data("MO", 24));
         series1.getData().add(new XYChart.Data("TU", 20));
@@ -50,7 +58,7 @@ public class Demo extends Application {
         series1.getData().add(new XYChart.Data("SA", 18));
         series1.getData().add(new XYChart.Data("SU", 20));
 
-        XYChart.Series<String, Number> series2 = new XYChart.Series();
+        series2 = new XYChart.Series();
         series2.setName("Series 2");
         series2.getData().add(new XYChart.Data("MO", 17));
         series2.getData().add(new XYChart.Data("TU", 19));
@@ -60,7 +68,7 @@ public class Demo extends Application {
         series2.getData().add(new XYChart.Data("SA", 18));
         series2.getData().add(new XYChart.Data("SU", 15));
 
-        XYChart.Series<String, Number> series3 = new XYChart.Series();
+        series3 = new XYChart.Series();
         series3.setName("Series 3");
         series3.getData().add(new XYChart.Data("MO", 24));
         series3.getData().add(new XYChart.Data("TU", 20));
@@ -70,7 +78,7 @@ public class Demo extends Application {
         series3.getData().add(new XYChart.Data("SA", 18));
         series3.getData().add(new XYChart.Data("SU", 20));
 
-        XYChart.Series<String, Number> series4= new XYChart.Series();
+        series4= new XYChart.Series();
         series4.setName("Series 4");
         series4.getData().add(new XYChart.Data("MO", 17));
         series4.getData().add(new XYChart.Data("TU", 19));
@@ -111,6 +119,8 @@ public class Demo extends Application {
         lineChartSmoothed.setInteractive(true);
         lineChartSmoothed.setSubDivisions(8);
         lineChartSmoothed.setSnapToTicks(false);
+        lineChartSmoothed.setSymbolColor(series2, new Background(new BackgroundFill(Color.BLUE, new CornerRadii(1024), Insets.EMPTY),
+                                                                 new BackgroundFill(Color.LIME, new CornerRadii(1024), new Insets(2))));
         lineChartSmoothed.setSymbolSize(series2, 20);
         lineChartSmoothed.setLegendVisible(false);
 

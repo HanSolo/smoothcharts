@@ -469,7 +469,6 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
             StackPane stackPane = (StackPane) data.getNode();
             if (null == stackPane) { continue; }
             stackPane.setPrefSize(symbolSize, symbolSize);
-            stackPane.setStyle("-fx-background-radius: 1024px");
         }
     }
 
