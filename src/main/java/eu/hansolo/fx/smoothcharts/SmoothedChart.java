@@ -88,6 +88,8 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
     private              ObjectProperty<Color>     selectorFillColor;
     private              Color                     _selectorStrokeColor;
     private              ObjectProperty<Color>     selectorStrokeColor;
+    private              double                    _selectorSize;
+    private              DoubleProperty            selectorSize;
     private              int                       _decimals;
     private              IntegerProperty           decimals;
     private              String                    formatString;
@@ -128,6 +130,7 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
         _snapToTicks               = true;
         _selectorFillColor         = Color.WHITE;
         _selectorStrokeColor       = Color.RED;
+        _selectorSize              = 10;
         _decimals                  = 2;
         _interactive               = true;
         _tooltipTimeout            = 2000;
@@ -353,6 +356,25 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
         return selectorStrokeColor;
     }
 
+    public double getSelectorSize() { return null == selectorSize ? _selectorSize : selectorSize.get(); }
+    public void setSelectorSize(final double SIZE) {
+        if (null == selectorSize) {
+            _selectorSize = Helper.clamp(1, 20, SIZE);
+        } else {
+            selectorSize.set(SIZE);
+        }
+    }
+    public DoubleProperty selectorSizeProperty() {
+        if (null == selectorSize) {
+            selectorSize = new DoublePropertyBase(_selectorSize) {
+                @Override protected void invalidated() { set(Helper.clamp(1, 20, get())); }
+                @Override public Object getBean() { return SmoothedChart.this; }
+                @Override public String getName() { return "selectorSize"; }
+            };
+        }
+        return selectorSize;
+    }
+
     public int getDecimals() { return null == decimals ? _decimals : decimals.get(); }
     public void setDecimals(final int DECIMALS) {
         if (null == decimals) {
@@ -559,11 +581,8 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
 
     private void resizeSelector(final Region CHART_BACKGROUND) {
         selector.setVisible(false);
-        final double CHART_WIDTH  = CHART_BACKGROUND.getLayoutBounds().getWidth();
-        final double CHART_HEIGHT = CHART_BACKGROUND.getLayoutBounds().getHeight();
-        final double SIZE         = CHART_WIDTH < CHART_HEIGHT ? CHART_WIDTH : CHART_HEIGHT;
-        selector.setRadius(SIZE * 0.01);
-        selector.setStrokeWidth(SIZE * 0.005);
+        selector.setRadius(getSelectorSize() * 0.5);
+        selector.setStrokeWidth(getSelectorSize() * 0.25);
     }
 
     private void select(final MouseEvent EVT) {
