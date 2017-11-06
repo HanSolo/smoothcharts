@@ -71,6 +71,7 @@ import java.util.stream.Collectors;
  * Time: 04:50
  */
 public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
+    public static final Background TRANSPARENT_BACKGROUND = new Background(new BackgroundFill(Color.TRANSPARENT, CornerRadii.EMPTY, Insets.EMPTY));
     public enum ChartType { LINE, AREA }
     private static final int                       MAX_SUBDIVISIONS = 16;
     private static final int                       MAX_DECIMALS     = 10;
