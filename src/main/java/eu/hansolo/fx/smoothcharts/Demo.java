@@ -27,6 +27,9 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 
@@ -151,7 +154,24 @@ public class Demo extends Application {
         areaChartSmoothed.setInteractive(true);
         areaChartSmoothed.setSubDivisions(8);
         areaChartSmoothed.setSnapToTicks(false);
-        areaChartSmoothed.setLegendVisible(false);
+        areaChartSmoothed.setLegendVisible(true);
+        areaChartSmoothed.setChartPlotBackground(Color.rgb(31,31, 31));
+        areaChartSmoothed.setSeriesColor(series4, Color.rgb(50, 240, 30), new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
+                                                                                             new Stop(0, Color.rgb(50, 240, 30).darker()),
+                                                                                             new Stop(1, Color.TRANSPARENT)));
+        areaChartSmoothed.setSymbolSize(series4, 10);
+        areaChartSmoothed.getHorizontalGridLines().setStroke(Color.DARKGRAY);
+        areaChartSmoothed.getVerticalGridLines().setStroke(Color.DARKGRAY);
+        areaChartSmoothed.setLegendBackground(Color.TRANSPARENT);
+        areaChartSmoothed.setXAxisTickLabelFill(Color.WHITE);
+        areaChartSmoothed.setYAxisTickLabelFill(Color.WHITE);
+        areaChartSmoothed.setLegendTextFill(series4, Color.WHITE);
+        areaChartSmoothed.setXAxisTickMarkFill(Color.WHITE);
+        areaChartSmoothed.setYAxisTickMarkFill(Color.WHITE);
+        areaChartSmoothed.setXAxisBorderColor(Color.WHITE);
+        areaChartSmoothed.setYAxisBorderColor(Color.WHITE);
+        areaChartSmoothed.getStrokePath(series4).setStrokeWidth(3);
+        areaChartSmoothed.getStrokePath(series4).setStroke(Color.rgb(50, 240, 30));
 
         lineChartNotSmoothed.addEventHandler(SmoothedChartEvent.DATA_SELECTED, e -> System.out.println("Selected value: " + e.getyValue()));
     }
