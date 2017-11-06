@@ -78,43 +78,44 @@ import java.util.stream.Collectors;
 public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
     public static final Background TRANSPARENT_BACKGROUND = new Background(new BackgroundFill(Color.TRANSPARENT, CornerRadii.EMPTY, Insets.EMPTY));
     public enum ChartType { LINE, AREA }
-    private static final int                       MAX_SUBDIVISIONS = 16;
-    private static final int                       MAX_DECIMALS     = 10;
-    private              boolean                   _smoothed;
-    private              BooleanProperty           smoothed;
-    private              ChartType                 _chartType;
-    private              ObjectProperty<ChartType> chartType;
-    private              int                       _subDivisions;
-    private              IntegerProperty           subDivisions;
-    private              boolean                   _snapToTicks;
-    private              BooleanProperty           snapToTicks;
-    private              boolean                   _symbolsVisible;
-    private              BooleanProperty           symbolsVisible;
-    private              Color                     _selectorFillColor;
-    private              ObjectProperty<Color>     selectorFillColor;
-    private              Color                     _selectorStrokeColor;
-    private              ObjectProperty<Color>     selectorStrokeColor;
-    private              double                    _selectorSize;
-    private              DoubleProperty            selectorSize;
-    private              int                       _decimals;
-    private              IntegerProperty           decimals;
-    private              String                    formatString;
-    private              Circle                    selector;
-    private              Tooltip                   selectorTooltip;
-    private              Region                    chartPlotBackground;
-    private              PauseTransition           timeBeforeFadeOut;
-    private              SequentialTransition      fadeInFadeOut;
-    private              List<Path>                strokePaths;
-    private              boolean                   _interactive;
-    private              BooleanProperty           interactive;
-    private              double                    _tooltipTimeout;
-    private              DoubleProperty            tooltipTimeout;
-    private              Path                      horizontalGridLines;
-    private              Path                      verticalGridLines;
-    private              Line                      horizontalZeroLine;
-    private              Line                      verticalZeroLine;
-    private              EventHandler<MouseEvent>  clickHandler;
-    private              EventHandler<ActionEvent> endOfTransformationHandler;
+    private static final int                              MAX_SUBDIVISIONS = 16;
+    private static final int                              MAX_DECIMALS     = 10;
+    private              boolean                          _smoothed;
+    private              BooleanProperty                  smoothed;
+    private              ChartType                        _chartType;
+    private              ObjectProperty<ChartType>        chartType;
+    private              int                              _subDivisions;
+    private              IntegerProperty                  subDivisions;
+    private              boolean                          _snapToTicks;
+    private              BooleanProperty                  snapToTicks;
+    private              boolean                          _symbolsVisible;
+    private              BooleanProperty                  symbolsVisible;
+    private              Color                            _selectorFillColor;
+    private              ObjectProperty<Color>            selectorFillColor;
+    private              Color                            _selectorStrokeColor;
+    private              ObjectProperty<Color>            selectorStrokeColor;
+    private              double                           _selectorSize;
+    private              DoubleProperty                   selectorSize;
+    private              int                              _decimals;
+    private              IntegerProperty                  decimals;
+    private              String                           formatString;
+    private              Circle                           selector;
+    private              Tooltip                          selectorTooltip;
+    private              Region                           chartPlotBackground;
+    private              PauseTransition                  timeBeforeFadeOut;
+    private              SequentialTransition             fadeInFadeOut;
+    private              List<Path>                       strokePaths;
+    private              boolean                          _interactive;
+    private              BooleanProperty                  interactive;
+    private              double                           _tooltipTimeout;
+    private              DoubleProperty                   tooltipTimeout;
+    private              Path                             horizontalGridLines;
+    private              Path                             verticalGridLines;
+    private              Line                             horizontalZeroLine;
+    private              Line                             verticalZeroLine;
+    private              EventHandler<MouseEvent>         clickHandler;
+    private              EventHandler<ActionEvent>        endOfTransformationHandler;
+    private              ListChangeListener<Series<X, Y>> seriesListener;
 
 
     // ******************** Constructors **************************************
@@ -147,7 +148,30 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
         formatString               = "%.2f";
         strokePaths                = new ArrayList<>();
         clickHandler               = e -> select(e);
-        endOfTransformationHandler = e -> { selectorTooltip.hide(); };
+        endOfTransformationHandler = e -> selectorTooltip.hide();
+        seriesListener             = change -> {
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    change.getAddedSubList().forEach(addedItem -> {
+                        final Series<X, Y> series     = addedItem;
+                        final Path         strokePath = (Path) ((Group) series.getNode()).getChildren().get(1);
+                        final Path         fillPath   = (Path) ((Group) series.getNode()).getChildren().get(0);
+                        fillPath.addEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
+                        strokePath.addEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
+                        strokePaths.add(strokePath);
+                    });
+                } else if (change.wasRemoved()) {
+                    change.getRemoved().forEach(removedItem -> {
+                        final Series<X, Y> series     = removedItem;
+                        final Path         strokePath = (Path) ((Group) series.getNode()).getChildren().get(1);
+                        final Path         fillPath   = (Path) ((Group) series.getNode()).getChildren().get(0);
+                        fillPath.removeEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
+                        strokePath.removeEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
+                        strokePaths.remove(strokePath);
+                    });
+                }
+            }
+        };
 
         // Add selector to chart
         selector = new Circle();
@@ -186,31 +210,9 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
     }
 
     private void registerListeners() {
-        getData().addListener((ListChangeListener<Series<X, Y>>) change -> {
-            while (change.next()) {
-                if (change.wasAdded()) {
-                    change.getAddedSubList().forEach(addedItem -> {
-                        final Series<X, Y> series     = addedItem;
-                        final Path         strokePath = (Path) ((Group) series.getNode()).getChildren().get(1);
-                        final Path         fillPath   = (Path) ((Group) series.getNode()).getChildren().get(0);
-                        fillPath.addEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
-                        strokePath.addEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
-                        strokePaths.add(strokePath);
-                    });
-                } else if (change.wasRemoved()) {
-                    change.getRemoved().forEach(removedItem -> {
-                        final Series<X, Y> series     = removedItem;
-                        final Path         strokePath = (Path) ((Group) series.getNode()).getChildren().get(1);
-                        final Path         fillPath   = (Path) ((Group) series.getNode()).getChildren().get(0);
-                        fillPath.removeEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
-                        strokePath.removeEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
-                        strokePaths.remove(strokePath);
-                    });
-
-                }
-            }
-        });
+        getData().addListener(seriesListener);
     }
+
 
     // ******************** Public Methods ************************************
     public boolean isSmoothed() { return null == smoothed ? _smoothed : smoothed.get(); }
@@ -465,11 +467,12 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
         setSeriesColor(SERIES, COLOR, COLOR, symbolBackground, COLOR);
     }
     public void setSeriesColor(final XYChart.Series<X, Y> SERIES, final Paint STROKE, final Paint FILL) {
-        Background symbolBackground = new Background(new BackgroundFill(STROKE, new CornerRadii(5), Insets.EMPTY), new BackgroundFill(Color.WHITE, new CornerRadii(5), new Insets(2)));
+        Background symbolBackground = new Background(new BackgroundFill(STROKE, new CornerRadii(1024), Insets.EMPTY), new BackgroundFill(Color.WHITE, new CornerRadii(1024), new Insets(2)));
         setSeriesColor(SERIES, STROKE, FILL, symbolBackground, STROKE);
     }
     public void setSeriesColor(final XYChart.Series<X, Y> SERIES, final Paint STROKE, final Paint FILL, final Paint LEGEND_SYMBOL_FILL) {
-        setSeriesColor(SERIES, STROKE, FILL, null, LEGEND_SYMBOL_FILL);
+        Background symbolBackground = new Background(new BackgroundFill(STROKE, new CornerRadii(1024), Insets.EMPTY), new BackgroundFill(Color.WHITE, new CornerRadii(1024), new Insets(2)));
+        setSeriesColor(SERIES, STROKE, FILL, symbolBackground, LEGEND_SYMBOL_FILL);
     }
     public void setSeriesColor(final XYChart.Series<X, Y> SERIES, final Paint STROKE, final Paint FILL, final Background SYMBOL_BACKGROUND) {
         setSeriesColor(SERIES, STROKE, FILL, SYMBOL_BACKGROUND, STROKE);
@@ -478,20 +481,12 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
         setSeriesColor(SERIES, STROKE, FILL, new Background(SYMBOL_STROKE, SYMBOL_Fill), STROKE);
     }
     public void setSeriesColor(final XYChart.Series<X, Y> SERIES, final Paint STROKE, final Paint FILL, final Background SYMBOL_BACKGROUND, final Paint LEGEND_SYMBOL_FILL) {
+        if (getData().isEmpty()) { return; }
         if (!getData().contains(SERIES)) { return; }
         if (null != FILL) { ((Path) ((Group) SERIES.getNode()).getChildren().get(0)).setFill(FILL); }
         if (null != STROKE) { ((Path) ((Group) SERIES.getNode()).getChildren().get(1)).setStroke(STROKE); }
         if (null != SYMBOL_BACKGROUND) { setSymbolColor(SERIES, SYMBOL_BACKGROUND); }
         if (null != LEGEND_SYMBOL_FILL) { setLegendSymbolColor(SERIES, LEGEND_SYMBOL_FILL); }
-    }
-
-    public void setSymbolColor(final Series<X, Y> SERIES, final Background SYMBOL_BACKGROUND) {
-        if (!getData().contains(SERIES)) { return; }
-        for (XYChart.Data<X, Y> data : SERIES.getData()) {
-            StackPane stackPane = (StackPane) data.getNode();
-            if (null == stackPane) { continue; }
-            stackPane.setBackground(SYMBOL_BACKGROUND);
-        }
     }
 
     public void setSymbolSize(final Series<X, Y> SERIES, final double SIZE) {
@@ -502,6 +497,15 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
             StackPane stackPane = (StackPane) data.getNode();
             if (null == stackPane) { continue; }
             stackPane.setPrefSize(symbolSize, symbolSize);
+        }
+    }
+
+    public void setSymbolColor(final Series<X, Y> SERIES, final Background SYMBOL_BACKGROUND) {
+        if (!getData().contains(SERIES)) { return; }
+        for (XYChart.Data<X, Y> data : SERIES.getData()) {
+            StackPane stackPane = (StackPane) data.getNode();
+            if (null == stackPane) { continue; }
+            stackPane.setBackground(SYMBOL_BACKGROUND);
         }
     }
 
@@ -641,6 +645,10 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
     public Path getStrokePath(final Series<X, Y> SERIES) { return getPaths(SERIES)[1]; }
     public List<StackPane> getSymbols(final Series<X, Y> SERIES) {
         return SERIES.getData().stream().map(node -> (StackPane) node.getNode()).collect(Collectors.toList());
+    }
+
+    public void dispose() {
+        getData().removeListener(seriesListener);
     }
 
 
