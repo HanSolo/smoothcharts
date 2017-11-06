@@ -30,6 +30,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 
+import static eu.hansolo.fx.smoothcharts.SmoothedChart.TRANSPARENT_BACKGROUND;
+
 
 /**
  * User: hansolo
@@ -111,6 +113,7 @@ public class Demo extends Application {
         lineChartNotSmoothed.setSubDivisions(8);
         lineChartNotSmoothed.setSnapToTicks(false);
         lineChartNotSmoothed.setLegendVisible(false);
+        lineChartNotSmoothed.getChartBackground().setBackground(TRANSPARENT_BACKGROUND);
 
         lineChartSmoothed = new SmoothedChart<>(xAxis2, yAxis2);
         lineChartSmoothed.getData().addAll(series2);
@@ -147,6 +150,7 @@ public class Demo extends Application {
 
     @Override public void start(Stage stage) {
         GridPane pane = new GridPane();
+        pane.setBackground(new Background(new BackgroundFill(Color.DARKGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
         pane.setPadding(new Insets(10));
         pane.setHgap(10);
         pane.setVgap(10);
