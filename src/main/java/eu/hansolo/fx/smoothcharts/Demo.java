@@ -132,7 +132,7 @@ public class Demo extends Application {
         areaChartSmoothed.setSnapToTicks(false);
         areaChartSmoothed.setLegendVisible(false);
 
-        lineChartNotSmoothed.addEventHandler(SmoothedChartEvent.DATA_SELECTED, e -> System.out.println("Selected value: " + e.getValue()));
+        lineChartNotSmoothed.addEventHandler(SmoothedChartEvent.DATA_SELECTED, e -> System.out.println("Selected value: " + e.getyValue()));
     }
 
     @Override public void start(Stage stage) {
