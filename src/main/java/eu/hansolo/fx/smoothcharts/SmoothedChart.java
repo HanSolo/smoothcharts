@@ -683,6 +683,7 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
     }
 
     private void resizeSelector() {
+        selectorTooltip.hide();
         selector.setVisible(false);
         selector.setRadius(getSelectorSize() * 0.5);
         selector.setStrokeWidth(getSelectorSize() * 0.25);
