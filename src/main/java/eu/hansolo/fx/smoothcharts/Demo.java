@@ -130,7 +130,7 @@ public class Demo extends Application {
         areaChartNotSmoothed.setChartType(ChartType.AREA);
         areaChartNotSmoothed.setInteractive(true);
         areaChartNotSmoothed.setSubDivisions(8);
-        areaChartNotSmoothed.setSnapToTicks(false);
+        areaChartNotSmoothed.setSnapToTicks(true);
         areaChartNotSmoothed.setLegendVisible(false);
 
         areaChartSmoothed = new SmoothedChart<>(xAxis4, yAxis4);
@@ -161,7 +161,7 @@ public class Demo extends Application {
         stage.setScene(scene);
         stage.show();
 
-        System.out.println(lineChartNotSmoothed.getStyleClass());
+        System.out.println(lineChartSmoothed.getSymbols(series2));
     }
 
     @Override public void stop() {
