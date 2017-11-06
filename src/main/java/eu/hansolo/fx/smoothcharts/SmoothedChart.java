@@ -36,6 +36,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
+import javafx.geometry.Side;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.chart.AreaChart;
@@ -46,6 +47,9 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -53,6 +57,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.ClosePath;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
@@ -104,6 +109,10 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
     private              BooleanProperty           interactive;
     private              double                    _tooltipTimeout;
     private              DoubleProperty            tooltipTimeout;
+    private              Path                      horizontalGridLines;
+    private              Path                      verticalGridLines;
+    private              Line                      horizontalZeroLine;
+    private              Line                      verticalZeroLine;
     private              EventHandler<MouseEvent>  clickHandler;
     private              EventHandler<ActionEvent> endOfTransformationHandler;
 
@@ -527,10 +536,102 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
         return chartPlotBackground;
     }
 
+    public Path getHorizontalGridLines() {
+        if (null == horizontalGridLines) {
+            for (Node node : lookupAll(".chart-horizontal-grid-lines")) {
+                if (node instanceof Path) {
+                    horizontalGridLines = (Path) node;
+                    break;
+                }
+            }
+        }
+        return horizontalGridLines;
+    }
+    public Path getVerticalGridLines() {
+        if (null == verticalGridLines) {
+            for (Node node : lookupAll(".chart-vertical-grid-lines")) {
+                if (node instanceof Path) {
+                    verticalGridLines = (Path) node;
+                    break;
+                }
+            }
+        }
+        return verticalGridLines;
+    }
+
+    public Line getHorizontalZeroLine() {
+        if (null == horizontalZeroLine) {
+            for (Node node : lookupAll(".chart-horizontal-zero-line")) {
+                if (node instanceof Line) {
+                    horizontalZeroLine = (Line) node;
+                    break;
+                }
+            }
+        }
+        return horizontalZeroLine;
+    }
+    public Line getVerticalZeroLine() {
+        if (null == verticalZeroLine) {
+            for (Node node : lookupAll(".chart-vertical-zero-line")) {
+                if (node instanceof Line) {
+                    verticalZeroLine = (Line) node;
+                    break;
+                }
+            }
+        }
+        return verticalZeroLine;
+    }
+
+    public void setXAxisTickMarkFill(final Paint FILL) {
+        for (Node node : getXAxis().lookupAll(".axis-tick-mark")) {
+            if (node instanceof Path) { ((Path) node).setStroke(FILL); break; }
+        }
+    }
+    public void setYAxisTickMarkFill(final Paint FILL) {
+        for (Node node : getYAxis().lookupAll(".axis-tick-mark")) {
+            if (node instanceof Path) { ((Path) node).setStroke(FILL); break; }
+        }
+        for (Node node : getYAxis().lookupAll(".axis-minor-tick-mark")) {
+            if (node instanceof Path) { ((Path) node).setStroke(FILL); break; }
+        }
+    }
+    public void setAxisTickMarkFill(final Paint FILL) {
+        setXAxisTickMarkFill(FILL);
+        setYAxisTickMarkFill(FILL);
+    }
+
+    public void setXAxisTickLabelFill(final Paint FILL) { getXAxis().setTickLabelFill(FILL); }
+    public void setYAxisTickLabelFill(final Paint FILL) { getYAxis().setTickLabelFill(FILL); }
+    public void setTickLabelFill(final Paint FILL) {
+        setXAxisTickLabelFill(FILL);
+        setYAxisTickLabelFill(FILL);
+    }
+
+    public void setXAxisBorderColor(final Paint FILL) {
+        if (Side.BOTTOM == getXAxis().getSide()) {
+            getXAxis().setBorder(new Border(
+                new BorderStroke(FILL, Color.TRANSPARENT, Color.TRANSPARENT, Color.TRANSPARENT, BorderStrokeStyle.SOLID, BorderStrokeStyle.SOLID, BorderStrokeStyle.SOLID,
+                                 BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderStroke.DEFAULT_WIDTHS, Insets.EMPTY)));
+        } else {
+            getXAxis().setBorder(new Border(
+                new BorderStroke(Color.TRANSPARENT, Color.TRANSPARENT, FILL, Color.TRANSPARENT, BorderStrokeStyle.SOLID, BorderStrokeStyle.SOLID, BorderStrokeStyle.SOLID,
+                                 BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderStroke.DEFAULT_WIDTHS, Insets.EMPTY)));
+        }
+    }
+    public void setYAxisBorderColor(final Paint FILL) {
+        if (Side.LEFT == getYAxis().getSide()) {
+            getYAxis().setBorder(new Border(
+                new BorderStroke(Color.TRANSPARENT, FILL, Color.TRANSPARENT, Color.TRANSPARENT, BorderStrokeStyle.SOLID, BorderStrokeStyle.SOLID, BorderStrokeStyle.SOLID,
+                                 BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderStroke.DEFAULT_WIDTHS, Insets.EMPTY)));
+        } else {
+            getYAxis().setBorder(new Border(
+                new BorderStroke(Color.TRANSPARENT, Color.TRANSPARENT, Color.TRANSPARENT, FILL, BorderStrokeStyle.SOLID, BorderStrokeStyle.SOLID, BorderStrokeStyle.SOLID,
+                                 BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderStroke.DEFAULT_WIDTHS, Insets.EMPTY)));
+        }
+    }
+
     public Path getFillPath(final Series<X, Y> SERIES) { return getPaths(SERIES) [0]; }
-
     public Path getStrokePath(final Series<X, Y> SERIES) { return getPaths(SERIES)[1]; }
-
     public List<StackPane> getSymbols(final Series<X, Y> SERIES) {
         return SERIES.getData().stream().map(node -> (StackPane) node.getNode()).collect(Collectors.toList());
     }
@@ -552,20 +653,6 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
             paths[0].setVisible(ChartType.AREA == getChartType());
             paths[0].setManaged(ChartType.AREA == getChartType());
         });
-    }
-
-    private Path getHorizontalGridLines() {
-        for (Node node : lookupAll(".chart-horizontal-grid-lines")) {
-            if (node instanceof Path) { return (Path) node; }
-        }
-        return null;
-    }
-
-    private Path getVerticalGridLines() {
-        for (Node node : lookupAll(".chart-vertical-grid-lines")) {
-            if (node instanceof Path) { return (Path) node; }
-        }
-        return null;
     }
 
     private Path[] getPaths(final Series<X, Y> SERIES) {
