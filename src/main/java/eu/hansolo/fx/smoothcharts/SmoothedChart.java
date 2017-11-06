@@ -62,6 +62,7 @@ import javafx.util.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 
 /**
@@ -69,7 +70,7 @@ import java.util.Locale;
  * Date: 03.11.17
  * Time: 04:50
  */
-public class SmoothedChart<T, S> extends AreaChart<T, S> {
+public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
     public enum ChartType { LINE, AREA }
     private static final int                       MAX_SUBDIVISIONS = 16;
     private static final int                       MAX_DECIMALS     = 10;
@@ -105,12 +106,12 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
 
 
     // ******************** Constructors **************************************
-    public SmoothedChart(final Axis<T> xAxis, final Axis<S> yAxis) {
+    public SmoothedChart(final Axis<X> xAxis, final Axis<Y> yAxis) {
         super(xAxis, yAxis);
         init();
         registerListeners();
     }
-    public SmoothedChart(final Axis<T> xAxis, final Axis<S> yAxis, final ObservableList<Series<T, S>> data) {
+    public SmoothedChart(final Axis<X> xAxis, final Axis<Y> yAxis, final ObservableList<Series<X, Y>> data) {
         super(xAxis, yAxis, data);
         init();
         registerListeners();
@@ -172,11 +173,11 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
     }
 
     private void registerListeners() {
-        getData().addListener((ListChangeListener<Series<T, S>>) change -> {
+        getData().addListener((ListChangeListener<Series<X, Y>>) change -> {
             while (change.next()) {
                 if (change.wasAdded()) {
                     change.getAddedSubList().forEach(addedItem -> {
-                        final Series<T, S> series     = addedItem;
+                        final Series<X, Y> series     = addedItem;
                         final Path         strokePath = (Path) ((Group) series.getNode()).getChildren().get(1);
                         final Path         fillPath   = (Path) ((Group) series.getNode()).getChildren().get(0);
                         fillPath.addEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
@@ -185,7 +186,7 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
                     });
                 } else if (change.wasRemoved()) {
                     change.getRemoved().forEach(removedItem -> {
-                        final Series<T, S> series     = removedItem;
+                        final Series<X, Y> series     = removedItem;
                         final Path         strokePath = (Path) ((Group) series.getNode()).getChildren().get(1);
                         final Path         fillPath   = (Path) ((Group) series.getNode()).getChildren().get(0);
                         fillPath.removeEventHandler(MouseEvent.MOUSE_PRESSED, clickHandler);
@@ -418,33 +419,33 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
         return tooltipTimeout;
     }
 
-    public void setSymbolsVisible(final XYChart.Series<T, S> SERIES, final boolean VISIBLE) {
+    public void setSymbolsVisible(final XYChart.Series<X, Y> SERIES, final boolean VISIBLE) {
         if (!getData().contains(SERIES)) { return; }
-        for (XYChart.Data<T, S> data : SERIES.getData()) {
+        for (XYChart.Data<X, Y> data : SERIES.getData()) {
             StackPane stackPane = (StackPane) data.getNode();
             if (null == stackPane) { continue; }
             stackPane.setVisible(VISIBLE);
         }
     }
 
-    public void setSeriesColor(final XYChart.Series<T, S> SERIES, final Paint COLOR) {
+    public void setSeriesColor(final XYChart.Series<X, Y> SERIES, final Paint COLOR) {
         Background symbolBackground = new Background(new BackgroundFill(COLOR, new CornerRadii(5), Insets.EMPTY), new BackgroundFill(Color.WHITE, new CornerRadii(5), new Insets(2)));
         setSeriesColor(SERIES, COLOR, COLOR, symbolBackground, COLOR);
     }
-    public void setSeriesColor(final XYChart.Series<T, S> SERIES, final Paint STROKE, final Paint FILL) {
+    public void setSeriesColor(final XYChart.Series<X, Y> SERIES, final Paint STROKE, final Paint FILL) {
         Background symbolBackground = new Background(new BackgroundFill(STROKE, new CornerRadii(5), Insets.EMPTY), new BackgroundFill(Color.WHITE, new CornerRadii(5), new Insets(2)));
         setSeriesColor(SERIES, STROKE, FILL, symbolBackground, STROKE);
     }
-    public void setSeriesColor(final XYChart.Series<T, S> SERIES, final Paint STROKE, final Paint FILL, final Paint LEGEND_SYMBOL_FILL) {
+    public void setSeriesColor(final XYChart.Series<X, Y> SERIES, final Paint STROKE, final Paint FILL, final Paint LEGEND_SYMBOL_FILL) {
         setSeriesColor(SERIES, STROKE, FILL, null, LEGEND_SYMBOL_FILL);
     }
-    public void setSeriesColor(final XYChart.Series<T, S> SERIES, final Paint STROKE, final Paint FILL, final Background SYMBOL_BACKGROUND) {
+    public void setSeriesColor(final XYChart.Series<X, Y> SERIES, final Paint STROKE, final Paint FILL, final Background SYMBOL_BACKGROUND) {
         setSeriesColor(SERIES, STROKE, FILL, SYMBOL_BACKGROUND, STROKE);
     }
-    public void setSeriesColor(final XYChart.Series<T, S> SERIES, final Paint STROKE, final Paint FILL, final BackgroundFill SYMBOL_STROKE, final BackgroundFill SYMBOL_Fill) {
+    public void setSeriesColor(final XYChart.Series<X, Y> SERIES, final Paint STROKE, final Paint FILL, final BackgroundFill SYMBOL_STROKE, final BackgroundFill SYMBOL_Fill) {
         setSeriesColor(SERIES, STROKE, FILL, new Background(SYMBOL_STROKE, SYMBOL_Fill), STROKE);
     }
-    public void setSeriesColor(final XYChart.Series<T, S> SERIES, final Paint STROKE, final Paint FILL, final Background SYMBOL_BACKGROUND, final Paint LEGEND_SYMBOL_FILL) {
+    public void setSeriesColor(final XYChart.Series<X, Y> SERIES, final Paint STROKE, final Paint FILL, final Background SYMBOL_BACKGROUND, final Paint LEGEND_SYMBOL_FILL) {
         if (!getData().contains(SERIES)) { return; }
         if (null != FILL) { ((Path) ((Group) SERIES.getNode()).getChildren().get(0)).setFill(FILL); }
         if (null != STROKE) { ((Path) ((Group) SERIES.getNode()).getChildren().get(1)).setStroke(STROKE); }
@@ -452,27 +453,27 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
         if (null != LEGEND_SYMBOL_FILL) { setLegendSymbolColor(SERIES, LEGEND_SYMBOL_FILL); }
     }
 
-    public void setSymbolColor(final Series<T, S> SERIES, final Background SYMBOL_BACKGROUND) {
+    public void setSymbolColor(final Series<X, Y> SERIES, final Background SYMBOL_BACKGROUND) {
         if (!getData().contains(SERIES)) { return; }
-        for (XYChart.Data<T, S> data : SERIES.getData()) {
+        for (XYChart.Data<X, Y> data : SERIES.getData()) {
             StackPane stackPane = (StackPane) data.getNode();
             if (null == stackPane) { continue; }
             stackPane.setBackground(SYMBOL_BACKGROUND);
         }
     }
 
-    public void setSymbolSize(final Series<T, S> SERIES, final double SIZE) {
+    public void setSymbolSize(final Series<X, Y> SERIES, final double SIZE) {
         if (!getData().contains(SERIES)) { return; }
         if (SERIES.getData().isEmpty()) { return; }
         double symbolSize = Helper.clamp(0, 30, SIZE);
-        for (XYChart.Data<T, S> data : SERIES.getData()) {
+        for (XYChart.Data<X, Y> data : SERIES.getData()) {
             StackPane stackPane = (StackPane) data.getNode();
             if (null == stackPane) { continue; }
             stackPane.setPrefSize(symbolSize, symbolSize);
         }
     }
 
-    public void setLegendSymbolColor(final Series<T, S> SERIES, final Paint LEGEND_SYMBOL_FILL) {
+    public void setLegendSymbolColor(final Series<X, Y> SERIES, final Paint LEGEND_SYMBOL_FILL) {
         if (getData().isEmpty()) { return; }
         if (!getData().contains(SERIES)) { return; }
 
@@ -491,6 +492,14 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
         symbol.setBackground(new Background(new BackgroundFill(LEGEND_SYMBOL_FILL, new CornerRadii(6), Insets.EMPTY)));
     }
 
+    public Path getFillPath(final Series<X, Y> SERIES) { return getPaths(SERIES) [0]; }
+
+    public Path getStrokePath(final Series<X, Y> SERIES) { return getPaths(SERIES)[1]; }
+
+    public List<StackPane> getSymbols(final Series<X, Y> SERIES) {
+        return SERIES.getData().stream().map(node -> (StackPane) node.getNode()).collect(Collectors.toList());
+    }
+
 
     // ******************** Internal Methods **********************************
     @Override public String getUserAgentStylesheet() {
@@ -501,18 +510,17 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
         super.layoutPlotChildren();
 
         double height = getLayoutBounds().getHeight();
-        for (int seriesIndex = 0; seriesIndex < getDataSize(); seriesIndex++) {
-            final XYChart.Series<T, S> series     = getData().get(seriesIndex);
-            final Path                 strokePath = (Path) ((Group) series.getNode()).getChildren().get(1);
-            final Path                 fillPath   = (Path) ((Group) series.getNode()).getChildren().get(0);
-            if (isSmoothed()) { smooth(strokePath.getElements(), fillPath.getElements(), height); }
-            fillPath.setVisible(ChartType.AREA == getChartType());
-            fillPath.setManaged(ChartType.AREA == getChartType());
-        }
+        getData().forEach(series -> {
+            final Path[] paths = getPaths(series);
+            if (null == paths) { return; }
+            if (isSmoothed()) { smooth(paths[1].getElements(), paths[0].getElements(), height); }
+            paths[0].setVisible(ChartType.AREA == getChartType());
+            paths[0].setManaged(ChartType.AREA == getChartType());
+        });
     }
 
     private int getDataSize() {
-        final ObservableList<Series<T, S>> data = getData();
+        final ObservableList<Series<X, Y>> data = getData();
         return (data != null) ? data.size() : 0;
     }
 
@@ -535,6 +543,18 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
             if (node instanceof Path) { return (Path) node; }
         }
         return null;
+    }
+
+    private Path[] getPaths(final Series<X, Y> SERIES) {
+        if (!getData().contains(SERIES)) { return null; }
+
+        Node seriesNode = SERIES.getNode();
+        if (null == seriesNode) { return null; }
+
+        Group seriesGroup = (Group) seriesNode;
+        if (seriesGroup.getChildren().isEmpty() || seriesGroup.getChildren().size() < 2) { return null; }
+
+        return new Path[] { (Path) (seriesGroup).getChildren().get(0), (Path) (seriesGroup).getChildren().get(1) };
     }
 
     private void resizeSelector(final Region CHART_BACKGROUND) {
@@ -569,7 +589,7 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
         double            factor       = range / getYAxis().getLayoutBounds().getHeight();
         PathElement       lastElement  = elements.get(0);
 
-        Series<T, S> series = getData().get(0);
+        Series<X, Y> series = getData().get(0);
         if (series.getData().isEmpty()) { return; }
 
         if (isSnapToTicks()) {
@@ -577,8 +597,8 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
             int        noOfDataElements = series.getData().size();
             double     interval         = pathWidth / (double) (noOfDataElements - 1);
             int        selectedIndex    = Helper.roundDoubleToInt((EVENT_X - pathMinX) / interval);
-            Data<T, S> selectedData     = series.getData().get(selectedIndex);
-            S          selectedYValue   = selectedData.getYValue();
+            Data<X, Y> selectedData     = series.getData().get(selectedIndex);
+            Y          selectedYValue   = selectedData.getYValue();
 
             if (!(selectedYValue instanceof Number)) { return; }
             double selectedValue = ((Number) selectedYValue).doubleValue();
