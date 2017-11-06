@@ -19,7 +19,6 @@ package eu.hansolo.fx.smoothcharts;
 import javafx.event.Event;
 import javafx.event.EventTarget;
 import javafx.event.EventType;
-import javafx.scene.chart.XYChart.Data;
 
 
 /**
@@ -29,19 +28,19 @@ import javafx.scene.chart.XYChart.Data;
  */
 public class SmoothedChartEvent extends Event {
     public static final EventType<SmoothedChartEvent> DATA_SELECTED  = new EventType<>(ANY, "DATA_SELECTED");
-    private final double value;
+    private final double yValue;
 
     // ******************** Constructors **************************************
-    public SmoothedChartEvent(final EventType<SmoothedChartEvent> TYPE, final double VALUE) {
+    public SmoothedChartEvent(final EventType<SmoothedChartEvent> TYPE, final double Y_VALUE) {
         super(TYPE);
-        value = VALUE;
+        yValue = Y_VALUE;
     }
-    public SmoothedChartEvent(final Object SRC, final EventTarget TARGET, final EventType<SmoothedChartEvent> TYPE, final double VALUE) {
+    public SmoothedChartEvent(final Object SRC, final EventTarget TARGET, final EventType<SmoothedChartEvent> TYPE, final double Y_VALUE) {
         super(SRC, TARGET, TYPE);
-        value = VALUE;
+        yValue = Y_VALUE;
     }
 
 
     // ******************** Methods *******************************************
-    public double getValue() { return value; }
+    public double getyValue() { return yValue; }
 }
