@@ -162,9 +162,9 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
         fadeInFadeOut.setOnFinished(endOfTransformationHandler);
 
         chartPlotBackground = getChartBackground();
-        chartPlotBackground.widthProperty().addListener(o -> resizeSelector(chartPlotBackground));
-        chartPlotBackground.heightProperty().addListener(o -> resizeSelector(chartPlotBackground));
-        chartPlotBackground.layoutYProperty().addListener(o -> resizeSelector(chartPlotBackground));
+        chartPlotBackground.widthProperty().addListener(o -> resizeSelector());
+        chartPlotBackground.heightProperty().addListener(o -> resizeSelector());
+        chartPlotBackground.layoutYProperty().addListener(o -> resizeSelector());
 
         Path horizontalGridLines = getHorizontalGridLines();
         if (null != horizontalGridLines) { horizontalGridLines.setMouseTransparent(true); }
@@ -514,6 +514,18 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
         symbol.setBackground(new Background(new BackgroundFill(LEGEND_SYMBOL_FILL, new CornerRadii(6), Insets.EMPTY)));
     }
 
+    public Region getChartBackground() {
+        if (null == chartPlotBackground) {
+            for (Node node : lookupAll(".chart-plot-background")) {
+                if (node instanceof Region) {
+                    chartPlotBackground = (Region) node;
+                    break;
+                }
+            }
+        }
+        return chartPlotBackground;
+    }
+
     public Path getFillPath(final Series<X, Y> SERIES) { return getPaths(SERIES) [0]; }
 
     public Path getStrokePath(final Series<X, Y> SERIES) { return getPaths(SERIES)[1]; }
@@ -539,18 +551,6 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
             paths[0].setVisible(ChartType.AREA == getChartType());
             paths[0].setManaged(ChartType.AREA == getChartType());
         });
-    }
-
-    private int getDataSize() {
-        final ObservableList<Series<X, Y>> data = getData();
-        return (data != null) ? data.size() : 0;
-    }
-
-    private Region getChartBackground() {
-        for (Node node : lookupAll(".chart-plot-background")) {
-            if (node instanceof Region) { return (Region) node; }
-        }
-        return null;
     }
 
     private Path getHorizontalGridLines() {
@@ -579,7 +579,7 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
         return new Path[] { (Path) (seriesGroup).getChildren().get(0), (Path) (seriesGroup).getChildren().get(1) };
     }
 
-    private void resizeSelector(final Region CHART_BACKGROUND) {
+    private void resizeSelector() {
         selector.setVisible(false);
         selector.setRadius(getSelectorSize() * 0.5);
         selector.setStrokeWidth(getSelectorSize() * 0.25);
