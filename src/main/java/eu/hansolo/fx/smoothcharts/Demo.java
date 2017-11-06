@@ -114,6 +114,14 @@ public class Demo extends Application {
         lineChartNotSmoothed.setSnapToTicks(false);
         lineChartNotSmoothed.setLegendVisible(false);
         lineChartNotSmoothed.getChartBackground().setBackground(TRANSPARENT_BACKGROUND);
+        lineChartNotSmoothed.getHorizontalGridLines().setStroke(Color.rgb(0, 0, 0, 0.5));
+        lineChartNotSmoothed.getVerticalGridLines().setStroke(Color.rgb(0, 0, 0, 0.5));
+        lineChartNotSmoothed.getHorizontalZeroLine().setStroke(Color.RED);
+        lineChartNotSmoothed.getVerticalZeroLine().setStroke(Color.BLUE);
+        lineChartNotSmoothed.setAxisTickMarkFill(Color.rgb(255, 255, 0, 0.5));
+        lineChartNotSmoothed.setTickLabelFill(Color.MAGENTA);
+        lineChartNotSmoothed.setXAxisBorderColor(Color.CYAN);     // set to Color.TRANSPARENT to see the horizontalZeroLine
+        lineChartNotSmoothed.setYAxisBorderColor(Color.DARKBLUE); // set to Color.TRANSPARENT to see the verticalZeroLine
 
         lineChartSmoothed = new SmoothedChart<>(xAxis2, yAxis2);
         lineChartSmoothed.getData().addAll(series2);
