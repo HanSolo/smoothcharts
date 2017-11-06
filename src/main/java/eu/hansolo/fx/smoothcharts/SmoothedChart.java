@@ -422,6 +422,7 @@ public class SmoothedChart<T, S> extends AreaChart<T, S> {
         if (!getData().contains(SERIES)) { return; }
         for (XYChart.Data<T, S> data : SERIES.getData()) {
             StackPane stackPane = (StackPane) data.getNode();
+            if (null == stackPane) { continue; }
             stackPane.setVisible(VISIBLE);
         }
     }
