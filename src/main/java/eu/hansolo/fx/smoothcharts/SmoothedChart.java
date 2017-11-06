@@ -584,6 +584,7 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
         legend.setBackground(BACKGROUND);
     }
 
+    public void setLegendTextFill(final Paint FILL) { getData().forEach(series -> setLegendSymbolFill(series, FILL)); }
     public void setLegendTextFill(final Series<X, Y> SERIES, final Paint FILL) {
         if (getData().isEmpty()) { return; }
         if (!getData().contains(SERIES)) { return; }
