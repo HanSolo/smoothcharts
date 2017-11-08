@@ -17,21 +17,32 @@
 package eu.hansolo.fx.smoothcharts;
 
 import eu.hansolo.fx.smoothcharts.SmoothedChart.ChartType;
+import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.effect.BlurType;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.effect.InnerShadow;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.RadialGradient;
 import javafx.scene.paint.Stop;
+import javafx.scene.shape.Path;
+import javafx.scene.shape.StrokeLineCap;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
+
+import java.util.Random;
 
 import static eu.hansolo.fx.smoothcharts.SmoothedChart.TRANSPARENT_BACKGROUND;
 
@@ -42,15 +53,25 @@ import static eu.hansolo.fx.smoothcharts.SmoothedChart.TRANSPARENT_BACKGROUND;
  * Time: 04:42
  */
 public class Demo extends Application {
+    private static final Random RND = new Random();
+
     private XYChart.Series<String, Number> series1;
     private XYChart.Series<String, Number> series2;
     private XYChart.Series<String, Number> series3;
     private XYChart.Series<String, Number> series4;
+    private SmoothedChart<String, Number>  lineChartNotSmoothed;
+    private SmoothedChart<String, Number>  lineChartSmoothed;
+    private SmoothedChart<String, Number>  areaChartNotSmoothed;
+    private SmoothedChart<String, Number>  areaChartSmoothed;
 
-    private SmoothedChart<String, Number> lineChartNotSmoothed;
-    private SmoothedChart<String, Number> lineChartSmoothed;
-    private SmoothedChart<String, Number> areaChartNotSmoothed;
-    private SmoothedChart<String, Number> areaChartSmoothed;
+    private XYChart.Series<String, Number> tweakedSeries1;
+    private XYChart.Series<String, Number> tweakedSeries2;
+    private XYChart.Series<String, Number> tweakedSeries3;
+    private SmoothedChart<String, Number>  tweakedChart;
+
+    private long                           lastTimerCall;
+    private AnimationTimer                 timer;
+
 
     @Override public void init() {
         series1 = new XYChart.Series();
@@ -174,6 +195,106 @@ public class Demo extends Application {
         areaChartSmoothed.getStrokePath(series4).setStroke(Color.rgb(50, 240, 30));
 
         lineChartNotSmoothed.addEventHandler(SmoothedChartEvent.DATA_SELECTED, e -> System.out.println("Selected value: " + e.getyValue()));
+
+
+        // Tweaked chart
+        tweakedSeries1 = new XYChart.Series();
+        tweakedSeries1.setName("Product 1");
+        tweakedSeries1.getData().add(new XYChart.Data<>("MO", 105));
+        tweakedSeries1.getData().add(new XYChart.Data<>("TU", 95));
+        tweakedSeries1.getData().add(new XYChart.Data<>("WE", 112));
+        tweakedSeries1.getData().add(new XYChart.Data<>("TH", 165));
+        tweakedSeries1.getData().add(new XYChart.Data<>("FR", 132));
+        tweakedSeries1.getData().add(new XYChart.Data<>("SA", 120));
+        tweakedSeries1.getData().add(new XYChart.Data<>("SU", 153));
+
+        tweakedSeries2 = new XYChart.Series();
+        tweakedSeries2.setName("Product 2");
+        tweakedSeries2.getData().add(new XYChart.Data<>("MO", 75));
+        tweakedSeries2.getData().add(new XYChart.Data<>("TU", 98));
+        tweakedSeries2.getData().add(new XYChart.Data<>("WE", 145));
+        tweakedSeries2.getData().add(new XYChart.Data<>("TH", 150));
+        tweakedSeries2.getData().add(new XYChart.Data<>("FR", 125));
+        tweakedSeries2.getData().add(new XYChart.Data<>("SA", 141));
+        tweakedSeries2.getData().add(new XYChart.Data<>("SU", 250));
+
+        tweakedSeries3 = new XYChart.Series();
+        tweakedSeries3.setName("Product 3");
+        tweakedSeries3.getData().add(new XYChart.Data<>("MO", 150));
+        tweakedSeries3.getData().add(new XYChart.Data<>("TU", 140));
+        tweakedSeries3.getData().add(new XYChart.Data<>("WE", 125));
+        tweakedSeries3.getData().add(new XYChart.Data<>("TH", 130));
+        tweakedSeries3.getData().add(new XYChart.Data<>("FR", 127));
+        tweakedSeries3.getData().add(new XYChart.Data<>("SA", 150));
+        tweakedSeries3.getData().add(new XYChart.Data<>("SU", 165));
+
+        tweakedChart = new SmoothedChart<>(new CategoryAxis(), new NumberAxis());
+        tweakedChart.getData().addAll(tweakedSeries1, tweakedSeries2, tweakedSeries3);
+        tweakedChart.setChartType(SmoothedChart.ChartType.AREA);
+        tweakedChart.setSeriesColor(tweakedSeries1, new LinearGradient(0, 0, 1, 0,
+                                                                       true, CycleMethod.NO_CYCLE,
+                                                                        new Stop(0, Color.web("#54D1FF")),
+                                                                        new Stop(1, Color.web("#016AED"))),
+                                     Color.TRANSPARENT);
+        tweakedChart.setSeriesColor(tweakedSeries2, new LinearGradient(0, 0, 1, 0,
+                                                                       true, CycleMethod.NO_CYCLE,
+                                                                        new Stop(0, Color.web("#F9348A")),
+                                                                        new Stop(1, Color.web("#EB123A"))),
+                             Color.TRANSPARENT);
+        tweakedChart.setSeriesColor(tweakedSeries3, new LinearGradient(0, 0, 1, 0,
+                                                                       true, CycleMethod.NO_CYCLE,
+                                                                        new Stop(0, Color.web("#7BFB00")),
+                                                                        new Stop(1, Color.web("#FCE207"))),
+                             Color.TRANSPARENT);
+        tweakedChart.getChartPlotBackground().setBackground(TRANSPARENT_BACKGROUND);
+        tweakedChart.setLegendBackground(TRANSPARENT_BACKGROUND);
+        tweakedChart.setLegendTextFill(Color.WHITE);
+        tweakedChart.setXAxisTickLabelFill(Color.web("#7A808D"));
+        tweakedChart.setYAxisTickLabelFill(Color.web("#7A808D"));
+        tweakedChart.setAxisTickMarkFill(Color.TRANSPARENT);
+        tweakedChart.setXAxisBorderColor(Color.TRANSPARENT);
+        tweakedChart.setYAxisBorderColor(Color.TRANSPARENT);
+        tweakedChart.getHorizontalGridLines().setStroke(Color.TRANSPARENT);
+
+        LinearGradient verticalGridLineGradient = new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
+                                                                     new Stop(0, Color.TRANSPARENT),
+                                                                     new Stop(0.35, Color.TRANSPARENT),
+                                                                     new Stop(1, Color.web("#7A808D")));
+
+        tweakedChart.getVerticalGridLines().setStroke(verticalGridLineGradient);
+        tweakedChart.setHorizontalZeroLineVisible(false);
+        tweakedChart.setSymbolsVisible(false);
+
+        Path tweakedSeries1Path = tweakedChart.getStrokePath(tweakedSeries1);
+        Path tweakedSeries2Path = tweakedChart.getStrokePath(tweakedSeries2);
+        Path tweakedSeries3Path = tweakedChart.getStrokePath(tweakedSeries3);
+
+        tweakedSeries1Path.setStrokeWidth(4);
+        tweakedSeries2Path.setStrokeWidth(4);
+        tweakedSeries3Path.setStrokeWidth(4);
+
+        tweakedSeries1Path.setStrokeLineCap(StrokeLineCap.ROUND);
+        tweakedSeries2Path.setStrokeLineCap(StrokeLineCap.ROUND);
+        tweakedSeries3Path.setStrokeLineCap(StrokeLineCap.ROUND);
+
+        InnerShadow lineLight  = new InnerShadow(BlurType.GAUSSIAN, Color.rgb(255, 255, 255, 0.65), 3, 0, 0, 2);
+        DropShadow  lineShadow = new DropShadow(BlurType.GAUSSIAN, Color.rgb(0, 0, 0, 0.45), 10, 0.0, 0.0, 15.0);
+        lineShadow.setInput(lineLight);
+        tweakedSeries1Path.setEffect(lineShadow);
+        tweakedSeries2Path.setEffect(lineShadow);
+        tweakedSeries3Path.setEffect(lineShadow);
+
+        lastTimerCall = System.nanoTime();
+        timer = new AnimationTimer() {
+            @Override public void handle(final long now) {
+                if (now > lastTimerCall + 3_000_000_000l) {
+                    tweakedSeries1.getData().forEach(data -> data.setYValue(RND.nextDouble() * 250));
+                    tweakedSeries2.getData().forEach(data -> data.setYValue(RND.nextDouble() * 250));
+                    tweakedSeries3.getData().forEach(data -> data.setYValue(RND.nextDouble() * 250));
+                    lastTimerCall = now;
+                }
+            }
+        };
     }
 
     @Override public void start(Stage stage) {
@@ -187,11 +308,21 @@ public class Demo extends Application {
         pane.add(areaChartNotSmoothed, 0, 1);
         pane.add(areaChartSmoothed, 1, 1);
 
+        StackPane chartPane = new StackPane(tweakedChart);
+        RadialGradient gradient = new RadialGradient(0, 0, 0.5, 0.25, 0.5, true, CycleMethod.NO_CYCLE,
+                                                     new Stop(0, Color.web("#313A48")),
+                                                     new Stop(1, Color.web("#26262D")));
+        chartPane.setBackground(new Background(new BackgroundFill(gradient, CornerRadii.EMPTY, Insets.EMPTY)));
+
+        pane.add(chartPane, 0, 2);
+
         Scene scene = new Scene(pane);
 
         stage.setTitle("Smooth Charts");
         stage.setScene(scene);
         stage.show();
+
+        timer.start();
 
         System.out.println(lineChartSmoothed.getSymbols(series2));
     }
