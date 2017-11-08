@@ -69,6 +69,10 @@ public class Demo extends Application {
     private XYChart.Series<String, Number> tweakedSeries3;
     private SmoothedChart<String, Number>  tweakedChart;
 
+    private XYChart.Series<String, Number> tweaked2Series1;
+    private XYChart.Series<String, Number> tweaked2Series2;
+    private SmoothedChart<String, Number>  tweaked2Chart;
+
     private long                           lastTimerCall;
     private AnimationTimer                 timer;
 
@@ -231,9 +235,16 @@ public class Demo extends Application {
         // Tweaked Chart
         tweakedChart = new SmoothedChart<>(new CategoryAxis(), new NumberAxis());
         tweakedChart.getData().addAll(tweakedSeries1, tweakedSeries2, tweakedSeries3);
+        tweakedChart.setSubDivisions(16);
 
         // Set the chart type (AREA or LINE);
         tweakedChart.setChartType(SmoothedChart.ChartType.LINE);
+
+        // Tweak the chart background
+        RadialGradient gradient = new RadialGradient(0, 0, 0.5, 0.25, 0.5, true, CycleMethod.NO_CYCLE,
+                                                     new Stop(0, Color.web("#313A48")),
+                                                     new Stop(1, Color.web("#26262D")));
+        tweakedChart.setBackground(new Background(new BackgroundFill(gradient, CornerRadii.EMPTY, Insets.EMPTY)));
 
         // Tweak the chart plot background
         tweakedChart.getChartPlotBackground().setBackground(TRANSPARENT_BACKGROUND);
@@ -297,11 +308,71 @@ public class Demo extends Application {
         tweakedSeries2Path.setEffect(lineShadow);
         tweakedSeries3Path.setEffect(lineShadow);
 
-        // Tweak series symbols
-        tweakedChart.setSymbolFill(tweakedSeries1, new Background(new BackgroundFill(Color.web("#26262D"), new CornerRadii(1024), Insets.EMPTY),
-                                                                  new BackgroundFill(Color.web("#54D1FF"), new CornerRadii(1024), new Insets(2))));
-        tweakedChart.setSymbolSize(tweakedSeries1, 10);
-        //tweakedChart.setSymbolsVisible(tweakedSeries1, true);
+
+        // Tweaked 2 Chart data
+        tweaked2Series1 = new XYChart.Series();
+        tweaked2Series1.setName("Products sold last year");
+        tweaked2Series1.getData().add(new XYChart.Data<>("Jan", 280));
+        tweaked2Series1.getData().add(new XYChart.Data<>("Feb", 190));
+        tweaked2Series1.getData().add(new XYChart.Data<>("Mar", 280));
+        tweaked2Series1.getData().add(new XYChart.Data<>("Apr", 300));
+        tweaked2Series1.getData().add(new XYChart.Data<>("May", 205));
+        tweaked2Series1.getData().add(new XYChart.Data<>("Jun", 430));
+        tweaked2Series1.getData().add(new XYChart.Data<>("Jul", 380));
+        tweaked2Series1.getData().add(new XYChart.Data<>("Aug", 180));
+        tweaked2Series1.getData().add(new XYChart.Data<>("Sep", 300));
+        tweaked2Series1.getData().add(new XYChart.Data<>("Oct", 440));
+        tweaked2Series1.getData().add(new XYChart.Data<>("Nov", 300));
+        tweaked2Series1.getData().add(new XYChart.Data<>("Dec", 390));
+
+        tweaked2Series2 = new XYChart.Series();
+        tweaked2Series2.setName("Revenue last year");
+        tweaked2Series2.getData().add(new XYChart.Data<>("Jan", 600));
+        tweaked2Series2.getData().add(new XYChart.Data<>("Feb", 760));
+        tweaked2Series2.getData().add(new XYChart.Data<>("Mar", 585));
+        tweaked2Series2.getData().add(new XYChart.Data<>("Apr", 410));
+        tweaked2Series2.getData().add(new XYChart.Data<>("May", 605));
+        tweaked2Series2.getData().add(new XYChart.Data<>("Jun", 825));
+        tweaked2Series2.getData().add(new XYChart.Data<>("Jul", 595));
+        tweaked2Series2.getData().add(new XYChart.Data<>("Aug", 300));
+        tweaked2Series2.getData().add(new XYChart.Data<>("Sep", 515));
+        tweaked2Series2.getData().add(new XYChart.Data<>("Oct", 780));
+        tweaked2Series2.getData().add(new XYChart.Data<>("Nov", 570));
+        tweaked2Series2.getData().add(new XYChart.Data<>("Dec", 620));
+
+        tweaked2Chart = new SmoothedChart<>(new CategoryAxis(), new NumberAxis());
+        tweaked2Chart.getData().addAll(tweaked2Series1, tweaked2Series2);
+        tweaked2Chart.setChartType(ChartType.AREA);
+        tweaked2Chart.setBackground(new Background(new BackgroundFill(Color.web("#293C47"), CornerRadii.EMPTY, Insets.EMPTY)));
+        tweaked2Chart.getChartPlotBackground().setBackground(TRANSPARENT_BACKGROUND);
+        tweaked2Chart.setXAxisTickLabelFill(Color.web("#85949B"));
+        tweaked2Chart.setYAxisTickLabelFill(Color.web("#85949B"));
+        tweaked2Chart.setAxisTickMarkFill(Color.TRANSPARENT);
+        tweaked2Chart.setHorizontalZeroLineVisible(false);
+        tweaked2Chart.setVerticalZeroLineVisible(false);
+        tweaked2Chart.setXAxisBorderColor(Color.TRANSPARENT);
+        tweaked2Chart.setYAxisBorderColor(Color.TRANSPARENT);
+        tweaked2Chart.setLegendBackground(Color.TRANSPARENT);
+        tweaked2Chart.setLegendTextFill(Color.web("#85949B"));
+
+        Path horizontalGridLines = tweaked2Chart.getHorizontalGridLines();
+        Path verticalGridLines   = tweaked2Chart.getVerticalGridLines();
+        horizontalGridLines.setStroke(Color.web("#384C57"));
+        verticalGridLines.setStroke(Color.web("#384C57"));
+
+        tweaked2Chart.setSeriesColor(tweaked2Series1, Color.web("#4EE29B"), Color.web("#4EE29B20"));
+        tweaked2Chart.getStrokePath(tweaked2Series1).setStrokeWidth(3);
+        tweaked2Chart.setSymbolFill(tweaked2Series1, new Background(new BackgroundFill(Color.web("#26262D"), new CornerRadii(1024), Insets.EMPTY),
+                                                                  new BackgroundFill(Color.web("#4EE29B"), new CornerRadii(1024), new Insets(2))));
+        tweaked2Chart.setSymbolSize(tweaked2Series1, 10);
+
+
+        tweaked2Chart.setSeriesColor(tweaked2Series2, Color.web("#00AEF5"), Color.web("#00AEF520"));
+        tweaked2Chart.getStrokePath(tweaked2Series2).setStrokeWidth(3);
+        tweaked2Chart.setSymbolFill(tweaked2Series2, new Background(new BackgroundFill(Color.web("#26262D"), new CornerRadii(1024), Insets.EMPTY),
+                                                                    new BackgroundFill(Color.web("#00AEF5"), new CornerRadii(1024), new Insets(2))));
+        tweaked2Chart.setSymbolSize(tweaked2Series2, 10);
+
 
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
@@ -310,6 +381,10 @@ public class Demo extends Application {
                     tweakedSeries1.getData().forEach(data -> data.setYValue(RND.nextDouble() * 250));
                     tweakedSeries2.getData().forEach(data -> data.setYValue(RND.nextDouble() * 250));
                     tweakedSeries3.getData().forEach(data -> data.setYValue(RND.nextDouble() * 250));
+
+                    tweaked2Series1.getData().forEach(data -> data.setYValue(RND.nextDouble() * 1000));
+                    tweaked2Series2.getData().forEach(data -> data.setYValue(RND.nextDouble() * 1000));
+
                     lastTimerCall = now;
                 }
             }
@@ -326,14 +401,9 @@ public class Demo extends Application {
         pane.add(lineChartSmoothed, 1, 0);
         pane.add(areaChartNotSmoothed, 0, 1);
         pane.add(areaChartSmoothed, 1, 1);
+        pane.add(tweakedChart, 0, 2);
+        pane.add(tweaked2Chart, 1, 2);
 
-        StackPane chartPane = new StackPane(tweakedChart);
-        RadialGradient gradient = new RadialGradient(0, 0, 0.5, 0.25, 0.5, true, CycleMethod.NO_CYCLE,
-                                                     new Stop(0, Color.web("#313A48")),
-                                                     new Stop(1, Color.web("#26262D")));
-        chartPane.setBackground(new Background(new BackgroundFill(gradient, CornerRadii.EMPTY, Insets.EMPTY)));
-
-        pane.add(chartPane, 0, 2);
 
         Scene scene = new Scene(pane);
 
@@ -342,8 +412,6 @@ public class Demo extends Application {
         stage.show();
 
         timer.start();
-
-        System.out.println(lineChartSmoothed.getSymbols(series2));
     }
 
     @Override public void stop() {

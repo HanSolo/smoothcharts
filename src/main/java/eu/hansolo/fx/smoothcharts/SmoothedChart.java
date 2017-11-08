@@ -144,7 +144,7 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
         _selectorStrokeColor       = Color.RED;
         _selectorSize              = 10;
         _decimals                  = 2;
-        _interactive               = true;
+        _interactive               = false;
         _tooltipTimeout            = 2000;
         formatString               = "%.2f";
         strokePaths                = new ArrayList<>();
