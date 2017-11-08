@@ -197,7 +197,7 @@ public class Demo extends Application {
         lineChartNotSmoothed.addEventHandler(SmoothedChartEvent.DATA_SELECTED, e -> System.out.println("Selected value: " + e.getyValue()));
 
 
-        // Tweaked chart
+        // Tweaked Chart data
         tweakedSeries1 = new XYChart.Series();
         tweakedSeries1.setName("Product 1");
         tweakedSeries1.getData().add(new XYChart.Data<>("MO", 105));
@@ -228,34 +228,29 @@ public class Demo extends Application {
         tweakedSeries3.getData().add(new XYChart.Data<>("SA", 150));
         tweakedSeries3.getData().add(new XYChart.Data<>("SU", 165));
 
+        // Tweaked Chart
         tweakedChart = new SmoothedChart<>(new CategoryAxis(), new NumberAxis());
         tweakedChart.getData().addAll(tweakedSeries1, tweakedSeries2, tweakedSeries3);
-        tweakedChart.setChartType(SmoothedChart.ChartType.AREA);
-        tweakedChart.setSeriesColor(tweakedSeries1, new LinearGradient(0, 0, 1, 0,
-                                                                       true, CycleMethod.NO_CYCLE,
-                                                                        new Stop(0, Color.web("#54D1FF")),
-                                                                        new Stop(1, Color.web("#016AED"))),
-                                     Color.TRANSPARENT);
-        tweakedChart.setSeriesColor(tweakedSeries2, new LinearGradient(0, 0, 1, 0,
-                                                                       true, CycleMethod.NO_CYCLE,
-                                                                        new Stop(0, Color.web("#F9348A")),
-                                                                        new Stop(1, Color.web("#EB123A"))),
-                             Color.TRANSPARENT);
-        tweakedChart.setSeriesColor(tweakedSeries3, new LinearGradient(0, 0, 1, 0,
-                                                                       true, CycleMethod.NO_CYCLE,
-                                                                        new Stop(0, Color.web("#7BFB00")),
-                                                                        new Stop(1, Color.web("#FCE207"))),
-                             Color.TRANSPARENT);
+
+        // Set the chart type (AREA or LINE);
+        tweakedChart.setChartType(SmoothedChart.ChartType.LINE);
+
+        // Tweak the chart plot background
         tweakedChart.getChartPlotBackground().setBackground(TRANSPARENT_BACKGROUND);
+
+        // Tweak the legend
         tweakedChart.setLegendBackground(TRANSPARENT_BACKGROUND);
         tweakedChart.setLegendTextFill(Color.WHITE);
+
+        // Tweak the axis
         tweakedChart.setXAxisTickLabelFill(Color.web("#7A808D"));
         tweakedChart.setYAxisTickLabelFill(Color.web("#7A808D"));
         tweakedChart.setAxisTickMarkFill(Color.TRANSPARENT);
         tweakedChart.setXAxisBorderColor(Color.TRANSPARENT);
         tweakedChart.setYAxisBorderColor(Color.TRANSPARENT);
-        tweakedChart.getHorizontalGridLines().setStroke(Color.TRANSPARENT);
 
+        // Tweak the grid lines
+        tweakedChart.getHorizontalGridLines().setStroke(Color.TRANSPARENT);
         LinearGradient verticalGridLineGradient = new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
                                                                      new Stop(0, Color.TRANSPARENT),
                                                                      new Stop(0.35, Color.TRANSPARENT),
@@ -265,6 +260,24 @@ public class Demo extends Application {
         tweakedChart.setHorizontalZeroLineVisible(false);
         tweakedChart.setSymbolsVisible(false);
 
+        // Tweak series colors
+        tweakedChart.setSeriesColor(tweakedSeries1, new LinearGradient(0, 0, 1, 0,
+                                                                       true, CycleMethod.NO_CYCLE,
+                                                                       new Stop(0, Color.web("#54D1FF")),
+                                                                       new Stop(1, Color.web("#016AED"))),
+                                    Color.TRANSPARENT);
+        tweakedChart.setSeriesColor(tweakedSeries2, new LinearGradient(0, 0, 1, 0,
+                                                                       true, CycleMethod.NO_CYCLE,
+                                                                       new Stop(0, Color.web("#F9348A")),
+                                                                       new Stop(1, Color.web("#EB123A"))),
+                                    Color.TRANSPARENT);
+        tweakedChart.setSeriesColor(tweakedSeries3, new LinearGradient(0, 0, 1, 0,
+                                                                       true, CycleMethod.NO_CYCLE,
+                                                                       new Stop(0, Color.web("#7BFB00")),
+                                                                       new Stop(1, Color.web("#FCE207"))),
+                                    Color.TRANSPARENT);
+
+        // Tweak series strokes
         Path tweakedSeries1Path = tweakedChart.getStrokePath(tweakedSeries1);
         Path tweakedSeries2Path = tweakedChart.getStrokePath(tweakedSeries2);
         Path tweakedSeries3Path = tweakedChart.getStrokePath(tweakedSeries3);
@@ -283,6 +296,12 @@ public class Demo extends Application {
         tweakedSeries1Path.setEffect(lineShadow);
         tweakedSeries2Path.setEffect(lineShadow);
         tweakedSeries3Path.setEffect(lineShadow);
+
+        // Tweak series symbols
+        tweakedChart.setSymbolFill(tweakedSeries1, new Background(new BackgroundFill(Color.web("#26262D"), new CornerRadii(1024), Insets.EMPTY),
+                                                                  new BackgroundFill(Color.web("#54D1FF"), new CornerRadii(1024), new Insets(2))));
+        tweakedChart.setSymbolSize(tweakedSeries1, 10);
+        //tweakedChart.setSymbolsVisible(tweakedSeries1, true);
 
         lastTimerCall = System.nanoTime();
         timer = new AnimationTimer() {
