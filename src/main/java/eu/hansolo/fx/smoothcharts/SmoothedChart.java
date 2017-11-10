@@ -34,6 +34,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
+import javafx.geometry.Dimension2D;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.Side;
@@ -78,8 +79,8 @@ import java.util.stream.Collectors;
  */
 public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
     public static final Background TRANSPARENT_BACKGROUND = new Background(new BackgroundFill(Color.TRANSPARENT, CornerRadii.EMPTY, Insets.EMPTY));
-    public enum ChartType { LINE, AREA }
-    private static final int                              MAX_SUBDIVISIONS = 16;
+    public enum ChartType { AREA, LINE }
+    private static final int                              MAX_SUBDIVISIONS = 64;
     private static final int                              MAX_DECIMALS     = 10;
     private              boolean                          _smoothed;
     private              BooleanProperty                  smoothed;
@@ -138,8 +139,8 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
 
         _smoothed                  = true;
         _chartType                 = ChartType.LINE;
-        _subDivisions              = 8;
-        _snapToTicks               = true;
+        _subDivisions              = 16;
+        _snapToTicks               = false;
         _selectorFillColor         = Color.WHITE;
         _selectorStrokeColor       = Color.RED;
         _selectorSize              = 10;
@@ -490,6 +491,19 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
         if (null != LEGEND_SYMBOL_FILL) { setLegendSymbolFill(SERIES, LEGEND_SYMBOL_FILL); }
     }
 
+    public Dimension2D getSymbolSize(final Series<X, Y> SERIES) {
+        if (!getData().contains(SERIES)) { return new Dimension2D(0, 0); }
+        if (SERIES.getData().isEmpty()) { return new Dimension2D(0, 0); }
+        for (XYChart.Data<X, Y> data : SERIES.getData()) {
+            StackPane stackPane = (StackPane) data.getNode();
+            if (null == stackPane) {
+                continue;
+            } else {
+                return new Dimension2D(stackPane.getLayoutBounds().getWidth(), stackPane.getLayoutBounds().getHeight());
+            }
+        }
+        return new Dimension2D(0, 0);
+    }
     public void setSymbolSize(final Series<X, Y> SERIES, final double SIZE) {
         if (!getData().contains(SERIES)) { return; }
         if (SERIES.getData().isEmpty()) { return; }
@@ -573,6 +587,13 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
     }
     public void setChartPlotBackground(final Background BACKGROUND) {
         getChartPlotBackground().setBackground(BACKGROUND);
+    }
+
+    public Group getChartPlotContent() {
+        for (Node node : lookupAll(".plot-content")) {
+            if (node instanceof Group) { return ((Group) node); }
+        }
+        return null;
     }
 
     public void setLegendBackground(final Paint FILL) {
@@ -702,6 +723,12 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
         });
     }
 
+    /**
+     * Returns an array of paths where the first entry represents the fill path
+     * and the second entry represents the stroke path
+     * @param SERIES
+     * @return an array of paths where [0] == FillPath and [1] == StrokePath
+     */
     private Path[] getPaths(final Series<X, Y> SERIES) {
         if (!getData().contains(SERIES)) { return null; }
 
@@ -711,7 +738,8 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
         Group seriesGroup = (Group) seriesNode;
         if (seriesGroup.getChildren().isEmpty() || seriesGroup.getChildren().size() < 2) { return null; }
 
-        return new Path[] { (Path) (seriesGroup).getChildren().get(0), (Path) (seriesGroup).getChildren().get(1) };
+        return new Path[] { /* FillPath   */ (Path) (seriesGroup).getChildren().get(0),
+                            /* StrokePath */ (Path) (seriesGroup).getChildren().get(1) };
     }
 
     private void resizeSelector() {
@@ -724,28 +752,42 @@ public class SmoothedChart<X, Y> extends AreaChart<X, Y> {
     private void select(final MouseEvent EVT) {
         if (!isInteractive()) { return; }
 
-        final Path   PATH         = (Path) EVT.getSource();
         final double EVENT_X      = EVT.getX();
+        final double EVENT_Y      = EVT.getY();
         final double CHART_X      = chartPlotBackground.getBoundsInParent().getMinX();
         final double CHART_MIN_Y  = chartPlotBackground.getBoundsInParent().getMinY();
         final double CHART_HEIGHT = chartPlotBackground.getBoundsInParent().getHeight();
 
-        if (!PATH.contains(new Point2D(EVT.getX(), EVT.getY()))) { return; }
         if (!(getYAxis() instanceof NumberAxis)) { return; }
 
         double            upperBound   = ((NumberAxis) getYAxis()).getUpperBound();
         double            lowerBound   = ((NumberAxis) getYAxis()).getLowerBound();
         double            range        = upperBound - lowerBound;
-        List<PathElement> elements     = PATH.getElements();
-        int               noOfElements = PATH.getElements().size();
-        Bounds            pathBounds   = PATH.getLayoutBounds();
-        double            pathMinX     = pathBounds.getMinX();
-        double            pathWidth    = pathBounds.getWidth();
         double            factor       = range / getYAxis().getLayoutBounds().getHeight();
-        PathElement       lastElement  = elements.get(0);
+        List<PathElement> elements     = null;
+        int               noOfElements = 0;
+        Bounds            pathBounds   = null;
+        double            pathMinX     = 0;
+        double            pathWidth    = 0;
+        PathElement       lastElement  = null;
 
-        Series<X, Y> series = getData().get(0);
-        if (series.getData().isEmpty()) { return; }
+        Series<X, Y> series = null;
+        for (Series<X, Y> s : getData()) {
+            Path[] paths = getPaths(s);
+            int type = getChartType().ordinal(); // AREA == 0, LINE == 1 in ChartType enum
+            if (paths[type].contains(EVENT_X, EVENT_Y)) {
+                series       = s;
+                elements     = paths[type].getElements();
+                noOfElements = elements.size();
+                lastElement  = elements.get(0);
+                pathBounds   = paths[1].getLayoutBounds();
+                pathMinX     = pathBounds.getMinX();
+                pathWidth    = pathBounds.getWidth();
+                break;
+            }
+        }
+
+        if (null == series || series.getData().isEmpty()) { return; }
 
         if (isSnapToTicks()) {
             double     reverseFactor    = CHART_HEIGHT / range;

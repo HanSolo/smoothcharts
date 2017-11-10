@@ -17,9 +17,9 @@
 package eu.hansolo.fx.smoothcharts;
 
 import eu.hansolo.fx.smoothcharts.SmoothedChart.ChartType;
-import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.geometry.Insets;
+import javafx.scene.Scene;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
@@ -30,8 +30,6 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -40,7 +38,6 @@ import javafx.scene.paint.Stop;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.stage.Stage;
-import javafx.scene.Scene;
 
 import java.util.Random;
 
@@ -72,9 +69,6 @@ public class Demo extends Application {
     private XYChart.Series<String, Number> tweaked2Series1;
     private XYChart.Series<String, Number> tweaked2Series2;
     private SmoothedChart<String, Number>  tweaked2Chart;
-
-    private long                           lastTimerCall;
-    private AnimationTimer                 timer;
 
 
     @Override public void init() {
@@ -235,7 +229,7 @@ public class Demo extends Application {
         // Tweaked Chart
         tweakedChart = new SmoothedChart<>(new CategoryAxis(), new NumberAxis());
         tweakedChart.getData().addAll(tweakedSeries1, tweakedSeries2, tweakedSeries3);
-        tweakedChart.setSubDivisions(16);
+        tweakedChart.setInteractive(true);
 
         // Set the chart type (AREA or LINE);
         tweakedChart.setChartType(SmoothedChart.ChartType.LINE);
@@ -343,6 +337,9 @@ public class Demo extends Application {
         tweaked2Chart = new SmoothedChart<>(new CategoryAxis(), new NumberAxis());
         tweaked2Chart.getData().addAll(tweaked2Series1, tweaked2Series2);
         tweaked2Chart.setChartType(ChartType.AREA);
+        tweaked2Chart.setInteractive(true);
+        tweaked2Chart.setSnapToTicks(true);
+
         tweaked2Chart.setBackground(new Background(new BackgroundFill(Color.web("#293C47"), CornerRadii.EMPTY, Insets.EMPTY)));
         tweaked2Chart.getChartPlotBackground().setBackground(TRANSPARENT_BACKGROUND);
         tweaked2Chart.setXAxisTickLabelFill(Color.web("#85949B"));
@@ -372,23 +369,6 @@ public class Demo extends Application {
         tweaked2Chart.setSymbolFill(tweaked2Series2, new Background(new BackgroundFill(Color.web("#26262D"), new CornerRadii(1024), Insets.EMPTY),
                                                                     new BackgroundFill(Color.web("#00AEF5"), new CornerRadii(1024), new Insets(2))));
         tweaked2Chart.setSymbolSize(tweaked2Series2, 10);
-
-
-        lastTimerCall = System.nanoTime();
-        timer = new AnimationTimer() {
-            @Override public void handle(final long now) {
-                if (now > lastTimerCall + 3_000_000_000l) {
-                    tweakedSeries1.getData().forEach(data -> data.setYValue(RND.nextDouble() * 250));
-                    tweakedSeries2.getData().forEach(data -> data.setYValue(RND.nextDouble() * 250));
-                    tweakedSeries3.getData().forEach(data -> data.setYValue(RND.nextDouble() * 250));
-
-                    tweaked2Series1.getData().forEach(data -> data.setYValue(RND.nextDouble() * 1000));
-                    tweaked2Series2.getData().forEach(data -> data.setYValue(RND.nextDouble() * 1000));
-
-                    lastTimerCall = now;
-                }
-            }
-        };
     }
 
     @Override public void start(Stage stage) {
@@ -410,8 +390,6 @@ public class Demo extends Application {
         stage.setTitle("Smooth Charts");
         stage.setScene(scene);
         stage.show();
-
-        timer.start();
     }
 
     @Override public void stop() {
